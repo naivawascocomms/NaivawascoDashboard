@@ -1,6 +1,6 @@
 # NAIVAWASCO DevOps Operations Guide
 
-This guide describes how to host the NAIVAWASCO system on a local Ubuntu server, expose it securely through Cloudflare Tunnel, and run CI/CD for the current monorepo or for a later split-repository setup.
+This guide describes how to host the NAIVAWASCO system on a local Ubuntu server, expose it securely through Cloudflare Tunnel without publishing `8000` or `8080` on the host, and run CI/CD for the current monorepo or for a later split-repository setup.
 
 Last updated: 2026-05-28
 
@@ -320,6 +320,7 @@ services:
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
       DJANGO_CORS_ALLOWED_ORIGINS: ${DJANGO_CORS_ALLOWED_ORIGINS}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS}
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable
       DATABASE_CONN_MAX_AGE: ${DATABASE_CONN_MAX_AGE:-60}
     depends_on:
@@ -337,8 +338,8 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
-    ports:
-      - "127.0.0.1:${FRONTEND_PORT:-8080}:80"
+    expose:
+      - "80"
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -363,10 +364,9 @@ POSTGRES_PASSWORD=<long-random-password>
 DJANGO_SECRET_KEY=<long-random-secret>
 DJANGO_ALLOWED_HOSTS=app.naivawasco.example.com,localhost,127.0.0.1
 DJANGO_CORS_ALLOWED_ORIGINS=https://app.naivawasco.example.com
+DJANGO_CSRF_TRUSTED_ORIGINS=https://app.naivawasco.example.com
 DATABASE_CONN_MAX_AGE=60
 GUNICORN_WORKERS=3
-
-FRONTEND_PORT=8080
 
 BACKEND_IMAGE=ghcr.io/<org>/naivawasco-backend:prod
 FRONTEND_IMAGE=ghcr.io/<org>/naivawasco-frontend:prod
@@ -376,7 +376,7 @@ CLOUDFLARE_TUNNEL_TOKEN=<cloudflare-tunnel-token>
 
 ## 8. Cloudflare Tunnel Setup
 
-Recommended: use a Cloudflare-managed tunnel with a token, then run `cloudflared` as a Docker Compose service.
+Recommended: use a Cloudflare-managed tunnel with a token, then run `cloudflared` as a Docker Compose service. The frontend and backend stay internal-only; Cloudflare is the only public ingress.
 
 Prerequisites:
 
@@ -418,6 +418,8 @@ Service:  http://frontend:80
 ```
 
 Use a separate tunnel or at least a separate hostname route. Separate tunnels are cleaner for production/staging isolation.
+
+If you are deploying the current monorepo with the root Compose files, pair them with `docker-compose.cloudflare.yml` so Docker does not publish host ports.
 
 ### 8.3 Protect Admin and Staging
 
@@ -1068,6 +1070,7 @@ Production must satisfy:
 - Strong database password.
 - No public database port.
 - No public backend port.
+- No public frontend port.
 - Cloudflare Tunnel token stored only on server and GitHub environment secrets if needed.
 - `/admin/*` protected with Cloudflare Access and Django auth.
 - Main branch protected.

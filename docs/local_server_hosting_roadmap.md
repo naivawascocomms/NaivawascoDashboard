@@ -11,7 +11,7 @@ This roadmap turns the NAIVAWASCO codebase into a repeatable local-server deploy
 
 ## Target Outcome
 
-Host the NAIVAWASCO web application on an internal local server so staff can access it from the LAN or through a secure Cloudflare Tunnel, while deployments are repeatable and controlled through CI/CD.
+Host the NAIVAWASCO web application on an internal local server so staff can access it through a secure Cloudflare Tunnel by default, with LAN access only as a temporary fallback while validating the deployment. Deployments should remain repeatable and controlled through CI/CD.
 
 The final production stack should run:
 
@@ -41,7 +41,7 @@ Local Ubuntu server
             +-- cloudflared: optional secure tunnel to Cloudflare
 ```
 
-For the fastest internal deployment, use the root `docker-compose.yml` from this monorepo. For staging/production with prebuilt images and Cloudflare, use `naivawasco-infra/compose/docker-compose.staging.yml` and `naivawasco-infra/compose/docker-compose.prod.yml`.
+For the fastest internal deployment, use the root `docker-compose.yml` from this monorepo. For tunnel-only public access, pair it with `docker-compose.cloudflare.yml`. For staging/production with prebuilt images and Cloudflare, use `naivawasco-infra/compose/docker-compose.staging.yml` and `naivawasco-infra/compose/docker-compose.prod.yml`.
 
 ## Phase 1: Confirm Deployment Scope
 
@@ -49,16 +49,15 @@ Deliverables:
 
 - Decide whether the first release is LAN-only or Cloudflare-exposed.
 - Pick server hostname or static LAN IP.
-- Pick ports:
-  - Frontend: `8080` for production LAN.
-  - Backend: `8000`, exposed only if administrators need direct API access.
-  - Staging frontend: `8081` if staging runs on the same server.
+- Frontend port: `8080` for LAN fallback only.
+- Backend port: `8000`, exposed only if administrators need direct API access and you are not using the tunnel-only profile.
+- Staging frontend port: `8081` if staging runs on the same server.
 - Decide whether the mobile Supabase sync worker should run on the same server.
 
 Recommended first milestone:
 
 ```text
-LAN-only Docker deployment using root docker-compose.yml
+Tunnel-only Docker deployment using root docker-compose.yml plus docker-compose.cloudflare.yml
 ```
 
 Recommended second milestone:
@@ -112,7 +111,7 @@ sudo ufw allow OpenSSH
 sudo ufw enable
 ```
 
-For LAN-only access, allow the frontend port only from the local network, for example:
+For LAN fallback access, allow the frontend port only from the local network, for example:
 
 ```bash
 sudo ufw allow from 192.168.0.0/16 to any port 8080 proto tcp
@@ -550,7 +549,7 @@ Do not declare the local server live until all items below are complete:
 
 Use this order to avoid blocking on CI/CD before the application is usable:
 
-1. Run LAN-only Docker deployment with the root `docker-compose.yml`.
+1. Run the tunnel-only Docker deployment with the root `docker-compose.yml` plus `docker-compose.cloudflare.yml`.
 2. Restore or seed data.
 3. Validate the app with real users on the LAN.
 4. Add backups and restore testing.

@@ -2,7 +2,7 @@
 
 Last updated: 2026-06-25
 
-This is the canonical first-deploy runbook for the current NAIVAWASCO monorepo. Use it when you want to clone the repository onto a local Ubuntu server, start the web stack with Docker, and optionally expose it through Cloudflare Tunnel.
+This is the canonical first-deploy runbook for the current NAIVAWASCO monorepo. Use it when you want to clone the repository onto a local Ubuntu server, start the web stack with Docker, and expose it through Cloudflare Tunnel without publishing `8000` or `8080` on the host.
 
 Use this document first. The other deployment documents provide deeper architecture and operations detail:
 
@@ -31,10 +31,10 @@ Do not split this into separate repositories unless you are also ready to change
 Use this order:
 
 1. Clone the monorepo onto the server.
-2. Run the root `docker-compose.yml` for LAN validation.
+2. Run the root `docker-compose.yml` for local validation only.
 3. Restore production data.
-4. Verify staff access on the LAN.
-5. Add Cloudflare Tunnel.
+4. Verify the stack works on the LAN if you need a temporary fallback path.
+5. Add Cloudflare Tunnel using `docker-compose.cloudflare.yml` so the host does not publish `8000` or `8080`.
 6. Move to `naivawasco-infra/compose/*.yml` only when you are ready for image-based staging/production deployment.
 
 ## 3. Prepare The Ubuntu Server
@@ -79,13 +79,18 @@ sudo ufw allow OpenSSH
 sudo ufw enable
 ```
 
-For LAN-only use, allow the frontend port from the LAN:
+For LAN-only fallback use, allow the frontend port from the LAN:
 
 ```bash
 sudo ufw allow from 192.168.0.0/16 to any port 8080 proto tcp
 ```
 
 If you will use Cloudflare Tunnel, do not open public inbound ports `80`, `443`, `8000`, or `8080`.
+Tunnel-only mode is the recommended public deployment path. Use the Cloudflare override so Docker does not publish `8000` or `8080` on the host:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml --profile cloudflare up -d
+```
 
 ## 4. Clone The Repository
 
@@ -144,7 +149,7 @@ docker compose ps
 docker compose logs -f backend
 ```
 
-Open:
+Open the LAN fallback only if you intentionally want direct internal access:
 
 ```text
 http://<SERVER_LAN_IP>:8080
@@ -180,7 +185,7 @@ Verify:
 
 ## 8. Add Cloudflare Tunnel
 
-After LAN validation, create a Cloudflare-managed tunnel and run the `cloudflared` connector through Docker Compose.
+After local validation, create a Cloudflare-managed tunnel and run the `cloudflared` connector through Docker Compose with the `cloudflare` profile and the Cloudflare override file.
 
 For the image-based staging/production path, the ready-made Compose files are:
 
@@ -205,6 +210,21 @@ Use Cloudflare Access to protect:
 ```text
 https://app.your-domain.com/admin/*
 https://staging.your-domain.com/*
+```
+
+Example server `.env` additions for the tunnel:
+
+```env
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,app.your-domain.com
+DJANGO_CORS_ALLOWED_ORIGINS=https://app.your-domain.com
+DJANGO_CSRF_TRUSTED_ORIGINS=https://app.your-domain.com
+CLOUDFLARE_TUNNEL_TOKEN=<cloudflare-tunnel-token>
+```
+
+Start the tunnel profile with:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml --profile cloudflare up -d
 ```
 
 ## 9. When To Move To naivawasco-infra

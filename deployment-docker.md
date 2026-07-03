@@ -1,6 +1,6 @@
 # Local Production Docker Deployment
 
-This setup runs the NAIVAWASCO web system inside the organization network:
+This setup runs the NAIVAWASCO web system inside the organization network. For public access, prefer Cloudflare Tunnel with the `docker-compose.cloudflare.yml` override so the host does not publish `8000` or `8080`.
 
 - PostgreSQL database container
 - Django backend container
@@ -27,7 +27,7 @@ Edit `.env` and set:
 - `DJANGO_CORS_ALLOWED_ORIGINS`
 - `MOBILE_SUPABASE_DATABASE_URL` if the Android app sync worker should run
 
-Use the production server LAN IP in the host/origin values, for example:
+Use the production server LAN IP in the host/origin values for LAN fallback only, for example:
 
 ```env
 DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,192.168.2.100
@@ -42,7 +42,7 @@ From the repository root:
 docker compose up -d --build
 ```
 
-Open the frontend from another machine on the same network:
+Open the frontend from another machine on the same network if you are using the LAN fallback:
 
 ```text
 http://SERVER_LAN_IP:8080
@@ -55,6 +55,12 @@ http://SERVER_LAN_IP:8000/api
 ```
 
 The frontend proxies `/api`, `/admin`, and `/static` through Nginx, so staff should normally use only port `8080`.
+
+For Cloudflare Tunnel deployments, use the override file so Docker does not publish either host port:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml --profile cloudflare up -d
+```
 
 ## 3. Load Existing Local PostgreSQL Data
 
