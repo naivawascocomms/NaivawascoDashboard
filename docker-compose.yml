@@ -1,0 +1,75 @@
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-naivawasco_local}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-this-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./naivawass_dashboard
+    restart: unless-stopped
+    environment:
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-False}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-this-secret-key}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DJANGO_CORS_ALLOWED_ORIGINS: ${DJANGO_CORS_ALLOWED_ORIGINS:-http://localhost:8080,http://127.0.0.1:8080}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-change-this-password}@db:5432/${POSTGRES_DB:-naivawasco_local}?sslmode=disable
+      MOBILE_SUPABASE_DATABASE_URL: ${MOBILE_SUPABASE_DATABASE_URL:-}
+      MOBILE_SUPABASE_URL: ${MOBILE_SUPABASE_URL:-}
+      MOBILE_SUPABASE_SERVICE_ROLE_KEY: ${MOBILE_SUPABASE_SERVICE_ROLE_KEY:-}
+      MOBILE_SUPABASE_DEFAULT_PASSWORD: ${MOBILE_SUPABASE_DEFAULT_PASSWORD:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate --noinput
+      && python manage.py collectstatic --noinput
+      && gunicorn dashboard.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120"
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+
+  frontend:
+    build:
+      context: ./production-pulse
+      args:
+        VITE_API_URL: /api
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+
+  mobile-sync:
+    build:
+      context: ./naivawass_dashboard
+    restart: unless-stopped
+    environment:
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-False}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-this-secret-key}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-change-this-password}@db:5432/${POSTGRES_DB:-naivawasco_local}?sslmode=disable
+      MOBILE_SUPABASE_DATABASE_URL: ${MOBILE_SUPABASE_DATABASE_URL:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "if [ -z \"$${MOBILE_SUPABASE_DATABASE_URL}\" ]; then
+      echo 'Mobile Supabase sync disabled: MOBILE_SUPABASE_DATABASE_URL is not set.';
+      tail -f /dev/null;
+      else
+      python manage.py sync_mobile_supabase --pull-submissions --loop --interval ${MOBILE_SYNC_INTERVAL:-10};
+      fi"
+
+volumes:
+  postgres_data:

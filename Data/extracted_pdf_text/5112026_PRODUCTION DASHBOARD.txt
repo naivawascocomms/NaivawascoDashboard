@@ -1,0 +1,534 @@
+FILE: C:\Users\icta\Desktop\programs\NWS CODEX\NAIVAWASCO\Data\5112026_PRODUCTION DASHBOARD.pdf
+PAGES: 6
+
+
+===== PAGE 1 TEXT =====
+TECHNICAL DASHBOARD PRODUCTION AND WATER QUALITY
+Apr-26
+Monthly Cumulative
+Unit Target Actual % real. Target Actual % real.
+DASHBOARD - VOLUMES PRODUCED - NON-REVENUE WATER
+1 DTI PRODUCTION SITE
+l l l l l l
+1a Water Volume Abstracted M3 44,020 30,710 70% 418,180 404,310 97%
+l l l l l l
+1b Water Volume Supplied M3 43,140 29,860 69% 409,816 383,969 94%
+l l l l l l
+1c Power Grid KWH 50,298 47,326 94% 502,983 494,928 98%
+l l l l l l
+1d Power Solar KWH 15,535 14,060 91% 155,348 122,772 79%
+l l l l l l
+1e Total Power Consumption KWH 65,833 61,386 93% 658,331 617,700 94%
+l l l l l l
+1f % Solar % 24% 23% 97% 24% 21% 90%
+l l l l l l
+1g Power Efficiency KWH/M3 1.5 2.0 75% 1.6 1.5 102%
+l l l l l l
+1h Production Loss M3 880.40 850.00 104% 8,364 20,341 41%
+2 WATERWORKS PRODUCTION SITE
+l l l l l l
+2a Water Volume Abstracted M3 19,650 16,477 84% 194,250 203,606 105%
+l l l l l l
+2b Water Volume Supplied M3 19,257 15,899 83% 190,365 190,516 100%
+l l l l l l
+2c Power Grid KWH 32,878 29,294 89% 328,777 339,147 103%
+l l l l l l
+2d Power solar KWH 10,118 7,185 71% 101,185 110,208 109%
+l l l
+2e Total Power Consumption KWH 42,996 36,479 85% 429,962 449,355 105%
+l l l l l l
+2f % Solar % 24% 20% 84% 24% 24% 102%
+l l l l l l
+2g Power Efficiency KWH/M3 2.2 2.2 99% 2.2 2.2 100%
+l l l l l l
+2h Production Loss M3 393 578 68% 3,885 13,090 30%
+3 A.I.C PRODUCTION SITE
+l l l l l l
+3a Water Volume Abstracted M3 9,620 6,972 72% 87,380 112,162 128%
+l l l
+3b Water Volume Supplied M3 9,428 6,840 73% 85,632 110,988 130%
+l l l l l l
+3c Power Consumption KWH 4,700 4,311 109% 46,998 60,731 77%
+l l l l l l
+3d Power Efficiency KWH/M3 0.5 0.6 79% 0.5 0.5 100%
+l l l l l l
+3e Production Loss M3 192 132 146% 1,748 1,174 149%
+4 KARATI PRODUCTION SITE
+l l l l l l
+4a Water Volume Abstracted M3 60,820 45,019 74% 605,100 544,021 90%
+l l l l l l
+4b Water Volume Supplied M3 51,484 43,192 84% 553,681 511,743 92%
+
+===== PAGE 1 TABLES 1 =====
+--- TABLE 1 rows=35 ---
+TECHNICAL DASHBOARD PRODUCTION AND WATER QUALITY														
+Apr-26 Monthly Cumulative Unit Target Actual % real. Target Actual % real.														
+			Monthly						Cumulative					
+		Unit				Target	Actual	% real.				Target	Actual	% real.
+DASHBOARD - VOLUMES PRODUCED - NON-REVENUE WATER														
+1	DTI PRODUCTION SITE													
+1a	Water Volume Abstracted	M3	l	l	l	44,020	30,710	70%	l	l	l	418,180	404,310	97%
+1b	Water Volume Supplied	M3	l	l	l	43,140	29,860	69%	l	l	l	409,816	383,969	94%
+1c	Power Grid	KWH	l	l	l	50,298	47,326	94%	l	l	l	502,983	494,928	98%
+1d	Power Solar	KWH	l	l	l	15,535	14,060	91%	l	l	l	155,348	122,772	79%
+1e	Total Power Consumption	KWH	l	l	l	65,833	61,386	93%	l	l	l	658,331	617,700	94%
+1f	% Solar	%	l	l	l	24%	23%	97%	l	l	l	24%	21%	90%
+1g	Power Efficiency	KWH/M3	l	l	l	1.5	2.0	75%	l	l	l	1.6	1.5	102%
+1h	Production Loss	M3	l	l	l	880.40	850.00	104%	l	l	l	8,364	20,341	41%
+														
+2	WATERWORKS PRODUCTION SITE													
+2a	Water Volume Abstracted	M3	l	l	l	19,650	16,477	84%	l	l	l	194,250	203,606	105%
+2b	Water Volume Supplied	M3	l	l	l	19,257	15,899	83%	l	l	l	190,365	190,516	100%
+2c	Power Grid	KWH	l	l	l	32,878	29,294	89%	l	l	l	328,777	339,147	103%
+2d	Power solar	KWH	l	l	l	10,118	7,185	71%	l	l	l	101,185	110,208	109%
+2e	Total Power Consumption	KWH		l	l	42,996	36,479	85%			l	429,962	449,355	105%
+2f	% Solar	%	l	l	l	24%	20%	84%	l	l	l	24%	24%	102%
+2g	Power Efficiency	KWH/M3	l	l	l	2.2	2.2	99%	l	l	l	2.2	2.2	100%
+2h	Production Loss	M3	l	l	l	393	578	68%	l	l	l	3,885	13,090	30%
+														
+3	A.I.C PRODUCTION SITE													
+3a	Water Volume Abstracted	M3	l	l	l	9,620	6,972	72%	l	l	l	87,380	112,162	128%
+3b	Water Volume Supplied	M3				9,428	6,840	73%	l	l	l	85,632	110,988	130%
+3c	Power Consumption	KWH	l	l	l	4,700	4,311	109%	l	l	l	46,998	60,731	77%
+3d	Power Efficiency	KWH/M3	l	l	l	0.5	0.6	79%	l	l	l	0.5	0.5	100%
+3e	Production Loss	M3	l	l	l	192	132	146%	l	l	l	1,748	1,174	149%
+														
+4	KARATI PRODUCTION SITE													
+4a	Water Volume Abstracted	M3	l	l	l	60,820	45,019	74%	l	l	l	605,100	544,021	90%
+4b	Water Volume Supplied	M3	l	l	l	51,484	43,192	84%	l	l	l	553,681	511,743	92%
+
+===== PAGE 2 TEXT =====
+TECHNICAL DASHBOARD PRODUCTION AND WATER QUALITY
+Apr-26
+Monthly Cumulative
+Unit Target Actual % real. Target Actual % real.
+l l l l l l
+4c Power Grid KWH 55,514 28,661 52% 555,141 384,968 69%
+l l l l l l
+4d Power Solar KWH 10,113 44,043 435% 101,132 214,653 212%
+l l l l l l
+4e Total Power Consumption KWH 65,627 72,704 111% 656,272 599,621 91%
+l l l l l l
+4f % Solar % 15% 61% 393% 15% 34% 218%
+l l l l l l
+4g Power Efficiency KWH/M3 0.2 1.6 10% 0.1 1.1 8%
+l l l l l l
+4h Production Loss M3 9,336 1,827 511% 51,419 32,278 159%
+5 DCK PRODUCTION SITE
+l l l l l l
+5a Water Volume Abstracted M3 10,600 7,918 75% 83,200 81,990 99%
+l l l l l l
+5b Water Volume Supplied M3 10,388 7,735 74% 81,536 77,917 96%
+l l l l l l
+5c Power Grid KWH 9,153 7,081 129% 91,531 7,081 1293%
+l l l l l l
+5d Power Solar KWH 0 42 0 593 0%
+l l l l l l
+5e Total Power Consumption KWH 9,153 7,123 78% 91,531 75,980 120%
+l l l l l l
+5f % Solar % 0% 1% 0% 1%
+l l l l l l
+5g Power Efficiency KWH/M3 0.9 0.9 96% 1.1 1.0 115%
+l l l l l l
+5h Production Loss M3 212 183 116% 1,664 4,073 41%
+6 POLICELINE PRODUCTION SITE
+l l l l l l
+6a Water Volume Abstracted M3 14,815 16,401 111% 145,940 209,912 144%
+l l l l l l
+6b Water Volume Supplied M3 14,519 15,963 110% 143,021 207,745 145%
+l l l l l l
+6c Power Grid KWH 11,030 10,774 102% 110,295 107,965 102%
+l l l l l l
+6d Power Solar KWH 3,802 2,536 67% 38,015 39,107 103%
+l l l l l l
+6e Total Power Consumption KWH 14,831 13,310 90% 148,310 147,072 99%
+l l l l l l
+6f % Solar % 26% 19% 74% 26% 27% 105%
+l l l l l l
+6g Power Efficiency KWH/M3 1.0 0.8 123% 1.0 0.7 144%
+l l l l l l
+6h Production Loss M3 296 438 68% 2,919 2,167 135%
+7 MAI MAHIU PRODUCTION SITE
+l l l l l l
+7a Water Volume Abstracted M3 9,000 5,928 66% 67,500 68,811 102%
+l l l l l l
+7b Water Volume Supplied M3 8,820 5,498 62% 46,113 66,150 143%
+l l l l l l
+7c Power Consumption KWH 4,109 5,291 78% 41,088 53,604 77%
+
+===== PAGE 2 TABLES 1 =====
+--- TABLE 1 rows=34 ---
+TECHNICAL DASHBOARD PRODUCTION AND WATER QUALITY														
+Apr-26 Monthly Cumulative Unit Target Actual % real. Target Actual % real.														
+			Monthly						Cumulative					
+		Unit				Target	Actual	% real.				Target	Actual	% real.
+4c	Power Grid	KWH	l	l	l	55,514	28,661	52%	l	l	l	555,141	384,968	69%
+4d	Power Solar	KWH	l	l	l	10,113	44,043	435%	l	l	l	101,132	214,653	212%
+4e	Total Power Consumption	KWH	l	l	l	65,627	72,704	111%	l	l	l	656,272	599,621	91%
+4f	% Solar	%	l	l	l	15%	61%	393%	l	l	l	15%	34%	218%
+4g	Power Efficiency	KWH/M3	l	l	l	0.2	1.6	10%	l	l	l	0.1	1.1	8%
+4h	Production Loss	M3	l	l	l	9,336	1,827	511%	l	l	l	51,419	32,278	159%
+														
+5	DCK PRODUCTION SITE													
+5a	Water Volume Abstracted	M3	l	l	l	10,600	7,918	75%	l	l	l	83,200	81,990	99%
+5b	Water Volume Supplied	M3	l	l	l	10,388	7,735	74%	l	l	l	81,536	77,917	96%
+5c	Power Grid	KWH	l	l	l	9,153	7,081	129%	l	l	l	91,531	7,081	1293%
+5d	Power Solar	KWH	l	l	l	0	42		l	l	l	0	593	0%
+5e	Total Power Consumption	KWH	l	l	l	9,153	7,123	78%	l	l	l	91,531	75,980	120%
+5f	% Solar	%	l	l	l	0%	1%		l	l	l	0%	1%	
+5g	Power Efficiency	KWH/M3	l	l	l	0.9	0.9	96%	l	l	l	1.1	1.0	115%
+5h	Production Loss	M3	l	l	l	212	183	116%	l	l	l	1,664	4,073	41%
+														
+6	POLICELINE PRODUCTION SITE													
+6a	Water Volume Abstracted	M3	l	l	l	14,815	16,401	111%	l	l	l	145,940	209,912	144%
+6b	Water Volume Supplied	M3	l	l	l	14,519	15,963	110%	l	l	l	143,021	207,745	145%
+6c	Power Grid	KWH	l	l	l	11,030	10,774	102%	l	l	l	110,295	107,965	102%
+6d	Power Solar	KWH	l	l	l	3,802	2,536	67%	l	l	l	38,015	39,107	103%
+6e	Total Power Consumption	KWH	l	l	l	14,831	13,310	90%	l	l	l	148,310	147,072	99%
+6f	% Solar	%	l	l	l	26%	19%	74%	l	l	l	26%	27%	105%
+6g	Power Efficiency	KWH/M3	l	l	l	1.0	0.8	123%	l	l	l	1.0	0.7	144%
+6h	Production Loss	M3	l	l	l	296	438	68%	l	l	l	2,919	2,167	135%
+7	MAI MAHIU PRODUCTION SITE													
+7a	Water Volume Abstracted	M3	l	l	l	9,000	5,928	66%	l	l	l	67,500	68,811	102%
+7b	Water Volume Supplied	M3	l	l	l	8,820	5,498	62%	l	l	l	46,113	66,150	143%
+7c	Power Consumption	KWH	l	l	l	4,109	5,291	78%	l	l	l	41,088	53,604	77%
+
+===== PAGE 3 TEXT =====
+TECHNICAL DASHBOARD PRODUCTION AND WATER QUALITY
+Apr-26
+Monthly Cumulative
+Unit Target Actual % real. Target Actual % real.
+l l l l l l
+7d Power Efficiency KWH/M3 0.5 0.9 51% 0.6 0.9 72%
+l l l l l l
+7e Production Loss M3 180 430 42% 1,350 1,350 100%
+8 MUCHIRINGIRI PRODUCTION SITE
+l l l l l l
+8a Water Volume Abstracted M3 50 0 0% 250 0 0%
+l l l l l l
+8b Water Volume Supplied M3 49 0 0% 245 0 0%
+l l l l l l
+8c Power Consumption KWH 0 0 0 0
+l l l l l l
+8d Power Efficiency KWH/M3 0.0 0.0 0.0 0.0
+l l l l l l
+8e Production Loss M3 1 0 5 5 100%
+9 NGONDI
+l l l l l l
+9a Water Volume Abstracted M3 850 633 74% 6,250 8,533 137%
+l l l l l l
+9b Water Volume Supplied M3 850 633 74% 46,113 6,250 14%
+l l l l l l
+9c Power Solar KWH 0 0 0 0
+l l l l l l
+9d Power Efficiency KWH/M3 0.0 0.0 0.0 0.0
+l l l l l l
+9e Production Loss M3 17 0 125 125 100%
+10 NYONJORO
+l l l l l l
+10a Water Volume Abstracted M3 370 236 64% 3,250 3,500 108%
+l l l l l l
+10b Water Volume Suplied M3 363 236 65% 3,185 3,500 110%
+l l l l l l
+10c Power Solar KWH 0 0 0 0
+l l l l l l
+10d Power Efficiency KWH/M3 0.0 0.0 0.0 0.0
+l l l l l l
+10e Production Loss M3 7 0 65 65 100%
+11 KARATI POLICE POST
+l l l l l l
+11a Water Volume Abstracted M3 460 223 48% 3,700 3,870 105%
+l l l l l l
+11b Water Volume Supplied M3 451 223 49% 46,113 3,626 8%
+l l l l l l
+11c Power Consumption KWH 525 178 295% 5,250 178 2949%
+l l l l l l
+11d Power Efficiency KWH/M3 1.1 0.8 143% 2.6 0.8 330%
+l l l l l l
+11e Production Loss M3 9 0 74 74 100%
+12 NIP
+l l l l l l
+12a Water Volume Abstracted M3 74,000 45,031 61% 695,000 638,828 92%
+l l l l l l
+12b Water Volume Supplied M3 74,000 43,584 59% 46,113 695,000 1507%
+l l l l l l
+12c Power Consumption KWH 57,805 54,948 105% 578,047 54,948 1052%
+
+===== PAGE 3 TABLES 1 =====
+--- TABLE 1 rows=34 ---
+TECHNICAL DASHBOARD PRODUCTION AND WATER QUALITY														
+Apr-26 Monthly Cumulative Unit Target Actual % real. Target Actual % real.														
+			Monthly						Cumulative					
+		Unit				Target	Actual	% real.				Target	Actual	% real.
+7d	Power Efficiency	KWH/M3	l	l	l	0.5	0.9	51%	l	l	l	0.6	0.9	72%
+7e	Production Loss	M3	l	l	l	180	430	42%	l	l	l	1,350	1,350	100%
+8	MUCHIRINGIRI PRODUCTION SITE													
+8a	Water Volume Abstracted	M3	l	l	l	50	0	0%	l	l	l	250	0	0%
+8b	Water Volume Supplied	M3	l	l	l	49	0	0%	l	l	l	245	0	0%
+8c	Power Consumption	KWH	l	l	l	0	0		l	l	l	0	0	
+8d	Power Efficiency	KWH/M3	l	l	l	0.0	0.0		l	l	l	0.0	0.0	
+8e	Production Loss	M3	l	l	l	1	0		l	l	l	5	5	100%
+9	NGONDI													
+9a	Water Volume Abstracted	M3	l	l	l	850	633	74%	l	l	l	6,250	8,533	137%
+9b	Water Volume Supplied	M3	l	l	l	850	633	74%	l	l	l	46,113	6,250	14%
+9c	Power Solar	KWH	l	l	l	0	0		l	l	l	0	0	
+9d	Power Efficiency	KWH/M3	l	l	l	0.0	0.0		l	l	l	0.0	0.0	
+9e	Production Loss	M3	l	l	l	17	0		l	l	l	125	125	100%
+10	NYONJORO													
+10a	Water Volume Abstracted	M3	l	l	l	370	236	64%	l	l	l	3,250	3,500	108%
+10b	Water Volume Suplied	M3	l	l	l	363	236	65%	l	l	l	3,185	3,500	110%
+10c	Power Solar	KWH	l	l	l	0	0		l	l	l	0	0	
+10d	Power Efficiency	KWH/M3	l	l	l	0.0	0.0		l	l	l	0.0	0.0	
+10e	Production Loss	M3	l	l	l	7	0		l	l	l	65	65	100%
+11	KARATI POLICE POST													
+11a	Water Volume Abstracted	M3	l	l	l	460	223	48%	l	l	l	3,700	3,870	105%
+11b	Water Volume Supplied	M3	l	l	l	451	223	49%	l	l	l	46,113	3,626	8%
+11c	Power Consumption	KWH	l	l	l	525	178	295%	l	l	l	5,250	178	2949%
+11d	Power Efficiency	KWH/M3	l	l	l	1.1	0.8	143%	l	l	l	2.6	0.8	330%
+11e	Production Loss	M3	l	l	l	9	0		l	l	l	74	74	100%
+12	NIP													
+12a	Water Volume Abstracted	M3	l	l	l	74,000	45,031	61%	l	l	l	695,000	638,828	92%
+12b	Water Volume Supplied	M3	l	l	l	74,000	43,584	59%	l	l	l	46,113	695,000	1507%
+12c	Power Consumption	KWH	l	l	l	57,805	54,948	105%	l	l	l	578,047	54,948	1052%
+
+===== PAGE 4 TEXT =====
+TECHNICAL DASHBOARD PRODUCTION AND WATER QUALITY
+Apr-26
+Monthly Cumulative
+Unit Target Actual % real. Target Actual % real.
+l l l l l l
+12d Power Efficiency KWH/M3 0.8 1.2 64% 0.8 1.2 68%
+l l l l l l
+12e Production Loss M3 1,480 1,447 102% 13,900 13,900 100%
+13 IHINDU
+l l l l l l
+13a Water Volume Abstracted M3 2,300 378 16% 18,500 5,795 31%
+l l l l l l
+13b Water Volume Supplied M3 74,000 378 1% 46,113 18,130 39%
+l l l l
+13c Power Consumption KWH 2,250 637 28% 22,500 8,004 36%
+l l l l
+13d Power Efficiency KWH/M3 1.0 2.3 231% 2.3 2.3 100%
+l l l l
+13e Production Loss M3 46 0 0% 370 370 100%
+14 MANERA
+l l l l l l
+14a Water Volume Abstracted M3 0 0 0 0
+l l l l l l
+14b Water Volume Supplied M3 0 0 0 0
+l l l l l l
+14c Power Grid KWH 0 0 0 0
+l l l l l l
+14d Power Solar KWH 0 0 0 0
+l l l l l l
+14e Total Power Consumption KWH 0 0 0 0
+l l l l l l
+14f % Solar % 0% 0% 0% 0%
+l l l l l l
+14g Power Efficiency KWH/M3 0.0 0.0 0.0 0.0
+l l l l l l
+14h Production Loss M3 0 0 0 0
+15 KIHOTO
+l l l l l l
+15a Water Volume Abstracted M3 0 0 0 0
+l l l l l l
+15b Water Volume Supplied M3 0 0 0 0
+l l l l l l
+15c Power Grid KWH 0 0 0 0
+l l l l l l
+15d Power Solar KWH 0 0 0 0
+l l l l l l
+15e Total Power Consumption KWH 0 0 0 0
+l l l l l l
+15f % Solar % 0% 0% 0% 0%
+l l l l l l
+15g Power Efficiency KWH/M3 0.0 0.0 0.0 0.0
+l l l l l l
+15h Production Loss M3 0 0 0 0
+16 TOTAL ABSTRACTION
+l l l l l l
+16a Total Water Volume Abstracted M3 246,555 175,926 71% 2,328,500 2,285,338 98%
+l l l l l l
+16b Total Water Volume Supplied M3 246,555 175,926 71% 2,328,500 2,285,338 98%
+l l l l l l
+16c Production Loss M3 13,050 5,885 222% 90,378 93,619 97%
+
+===== PAGE 4 TABLES 1 =====
+--- TABLE 1 rows=34 ---
+TECHNICAL DASHBOARD PRODUCTION AND WATER QUALITY														
+Apr-26 Monthly Cumulative Unit Target Actual % real. Target Actual % real.														
+			Monthly						Cumulative					
+		Unit				Target	Actual	% real.				Target	Actual	% real.
+12d	Power Efficiency	KWH/M3	l	l	l	0.8	1.2	64%	l	l	l	0.8	1.2	68%
+12e	Production Loss	M3	l	l	l	1,480	1,447	102%	l	l	l	13,900	13,900	100%
+13	IHINDU													
+13a	Water Volume Abstracted	M3	l	l	l	2,300	378	16%	l	l	l	18,500	5,795	31%
+13b	Water Volume Supplied	M3	l	l	l	74,000	378	1%	l	l	l	46,113	18,130	39%
+13c	Power Consumption	KWH	l	l		2,250	637	28%	l	l		22,500	8,004	36%
+13d	Power Efficiency	KWH/M3	l	l		1.0	2.3	231%	l	l		2.3	2.3	100%
+13e	Production Loss	M3	l	l		46	0	0%	l	l		370	370	100%
+14	MANERA													
+14a	Water Volume Abstracted	M3	l	l	l	0	0		l	l	l	0	0	
+14b	Water Volume Supplied	M3	l	l	l	0	0		l	l	l	0	0	
+14c	Power Grid	KWH	l	l	l	0	0		l	l	l	0	0	
+14d	Power Solar	KWH	l	l	l	0	0		l	l	l	0	0	
+14e	Total Power Consumption	KWH	l	l	l	0	0		l	l	l	0	0	
+14f	% Solar	%	l	l	l	0%	0%		l	l	l	0%	0%	
+14g	Power Efficiency	KWH/M3	l	l	l	0.0	0.0		l	l	l	0.0	0.0	
+14h	Production Loss	M3	l	l	l	0	0		l	l	l	0	0	
+15	KIHOTO													
+15a	Water Volume Abstracted	M3	l	l	l	0	0		l	l	l	0	0	
+15b	Water Volume Supplied	M3	l	l	l	0	0		l	l	l	0	0	
+15c	Power Grid	KWH	l	l	l	0	0		l	l	l	0	0	
+15d	Power Solar	KWH	l	l	l	0	0		l	l	l	0	0	
+15e	Total Power Consumption	KWH	l	l	l	0	0		l	l	l	0	0	
+15f	% Solar	%	l	l	l	0%	0%		l	l	l	0%	0%	
+15g	Power Efficiency	KWH/M3	l	l	l	0.0	0.0		l	l	l	0.0	0.0	
+15h	Production Loss	M3	l	l	l	0	0		l	l	l	0	0	
+16TOTAL ABSTRACTION														
+16a	Total Water Volume Abstracted	M3	l	l	l	246,555	175,926	71%	l	l	l	2,328,500	2,285,338	98%
+16b	Total Water Volume Supplied	M3	l	l	l	246,555	175,926	71%	l	l	l	2,328,500	2,285,338	98%
+16c	Production Loss	M3	l	l	l	13,050	5,885	222%	l	l	l	90,378	93,619	97%
+
+===== PAGE 5 TEXT =====
+TECHNICAL DASHBOARD PRODUCTION AND WATER QUALITY
+Apr-26
+Monthly Cumulative
+Unit Target Actual % real. Target Actual % real.
+l l l l l l
+16e Production Loss % % 5.6% 3.3% 167% 4.0% 41.1% 10%
+l l l l l l
+16f Water Available for Sales Abstracted M3 233,491 170,041 73% 2,237,988 2,191,719 98%
+17 SUMMARY
+l l l l l l
+17a CLOSING DATE CENTRAL REGION M3 0 23/4/2026 0 23/4/2026
+l l l l l l
+17b CENTRAL - Available for sale M3 103,415 79,438 77% 1,043,382 1,013,419 97%
+l l l l l l
+17c CLOSING DATE SOUTHERN REGION M3 0 15/4/2026 0 8/3/2151
+l l l l l l
+17d SOUTHERN - Available for sale M3 92,232 57,450 62% 832,347 768,407 92%
+l l l l l l
+17e CLOSING DATE EASTERN REGION M3 0 7/4/2026 0 7/4/2026
+l l l l l l
+17f EASTERN - Available for sale M3 37,862 32,310 85% 366,881 390,219 106%
+DASHBOARD - POWER CONSUMPTION / COSTS / EFFICIENCY
+l l l l l l
+18a Power Grid Kwh 228,261 188,501 121% 2,282,609 2,304,359 99%
+l l l l l l
+18b Power Solar KWH 39,568 67,866 172% 395,679 487,333 123%
+l l l l l l
+18c Total Power Consumption Kwh 267,829 256,366 104% 2,678,288 2,791,692 96%
+l l l l l l
+18d % Solar % 14.77% 26.47% 56% 14.77% 18.07% 82%
+l l l l l l
+18e Power (pump) efficiency kwh/m3 1.15 1.46 79% 1.20 1.22 98%
+l l l l l l
+18f Power costs per m3 water produced Ksh/m3 30 41 74% 31 33 93%
+l l l l l l
+18g Power costs per kwh Ksh/kwh 32 28 114% 32 28 114%
+DASHBOARD - PRODUCTION COSTS / OPERATIONAL RESULT WATER
+l l l l l l
+19a Power costs Ksh 7,472,271 7,178,251 104% 71,763,499 74,733,633 96%
+l l l l l l
+19b Repair & Maintenance Production Ksh 0 959,469 0% 465,800 4,272,633 11%
+l l l l l l
+19c Abstraction fee Ksh 493,110 351,852 140% 4,657,000 5,405,042 86%
+l l l l l l
+19d Chemicals costs Ksh 104,872 0 1,048,720 83,437 1257%
+l l l l l l
+19e Total direct costs WATER Ksh 8,070,253 8,489,572 95% 77,935,019 84,494,745 92%
+l l l l l l
+19f Total direct costs WATER per m3 water produced Ksh/m3 33 0 33 33 102%
+l l l l l l
+19g Direct operational result WATER before depreciation Ksh 0 0 0 0
+l l l l l l
+19h Direct operational result WATER before depreciation per m3 water prodKushce/md 3 0 0 0 0
+
+===== PAGE 5 TABLES 1 =====
+--- TABLE 1 rows=30 ---
+TECHNICAL DASHBOARD PRODUCTION AND WATER QUALITY														
+Apr-26 Monthly Cumulative Unit Target Actual % real. Target Actual % real.														
+			Monthly						Cumulative					
+		Unit				Target	Actual	% real.				Target	Actual	% real.
+16e	Production Loss %	%	l	l	l	5.6%	3.3%	167%	l	l	l	4.0%	41.1%	10%
+16f	Water Available for Sales Abstracted	M3	l	l	l	233,491	170,041	73%	l	l	l	2,237,988	2,191,719	98%
+17SUMMARY														
+17a	CLOSING DATE CENTRAL REGION	M3	l	l	l	0	23/4/2026		l	l	l	0	23/4/2026	
+17b	CENTRAL - Available for sale	M3	l	l	l	103,415	79,438	77%	l	l	l	1,043,382	1,013,419	97%
+17c	CLOSING DATE SOUTHERN REGION	M3	l	l	l	0	15/4/2026		l	l	l	0	8/3/2151	
+17d	SOUTHERN - Available for sale	M3	l	l	l	92,232	57,450	62%	l	l	l	832,347	768,407	92%
+17e	CLOSING DATE EASTERN REGION	M3	l	l	l	0	7/4/2026		l	l	l	0	7/4/2026	
+17f	EASTERN - Available for sale	M3	l	l	l	37,862	32,310	85%	l	l	l	366,881	390,219	106%
+DASHBOARD - POWER CONSUMPTION / COSTS / EFFICIENCY														
+18a	Power Grid	Kwh	l	l	l	228,261	188,501	121%	l	l	l	2,282,609	2,304,359	99%
+18b	Power Solar	KWH	l	l	l	39,568	67,866	172%	l	l	l	395,679	487,333	123%
+18c	Total Power Consumption	Kwh	l	l	l	267,829	256,366	104%	l	l	l	2,678,288	2,791,692	96%
+18d	% Solar	%	l	l	l	14.77%	26.47%	56%	l	l	l	14.77%	18.07%	82%
+18e	Power (pump) efficiency	kwh/m3	l	l	l	1.15	1.46	79%	l	l	l	1.20	1.22	98%
+18f	Power costs per m3 water produced	Ksh/m3	l	l	l	30	41	74%	l	l	l	31	33	93%
+18g	Power costs per kwh	Ksh/kwh	l	l	l	32	28	114%	l	l	l	32	28	114%
+DASHBOARD - PRODUCTION COSTS / OPERATIONAL RESULT WATER														
+19a	Power costs	Ksh	l	l	l	7,472,271	7,178,251	104%	l	l	l	71,763,499	74,733,633	96%
+19b	Repair & Maintenance Production	Ksh	l	l	l	0	959,469	0%	l	l	l	465,800	4,272,633	11%
+19c	Abstraction fee	Ksh	l	l	l	493,110	351,852	140%	l	l	l	4,657,000	5,405,042	86%
+19d	Chemicals costs	Ksh	l	l	l	104,872	0		l	l	l	1,048,720	83,437	1257%
+19e	Total direct costs WATER Ksh		l	l	l	8,070,253	8,489,572	95%	l	l	l	77,935,019	84,494,745	92%
+19f	Total direct costs WATER per m3 water produced Ksh/m3		l	l	l	33	0		l	l	l	33	33	102%
+19g	Direct operational result WATER before depreciation Ksh		l	l	l	0	0		l	l	l	0	0	
+19h	Direct operational result WATER before depreciation per m3 water prodKushce/md3		l	l	l	0	0		l	l	l	0	0	
+
+===== PAGE 6 TEXT =====
+TECHNICAL DASHBOARD PRODUCTION AND WATER QUALITY
+Apr-26
+Monthly Cumulative
+Unit Target Actual % real. Target Actual % real.
+DASHBOARD - WATER QUALITY
+l l l l l l
+20a Number of tests compared to budget, production, chemical # 298 297 100% 2,980 2,979 100%
+l l l l l l
+20b Number of tests compared to budget, production, biological # 42 43 102% 420 421 100%
+l l l l l l
+20c Number of tests compared to budget, consumer, chemical # 312 304 97% 3,120 3,143 101%
+l l l l l l
+20d Number of tests compared to budget, consumer, biological # 134 131 98% 1,340 1,310 98%
+l l l l l l
+20e Number of tests compared to budget, production, chemical # 298 295 99% 2,980 2,921 98%
+l l l l l l
+20f Number of tests compared to budget, production, biological # 42 40 95% 420 411 98%
+l l l l l l
+20g Number of tests compared to budget, consumer, chemical # 312 304 97% 3,120 3,143 101%
+l l l l l l
+20h Number of tests compared to budget, consumer, biological # 134 125 93% 1,340 1,214 91%
+l l l l l l
+20i % compliance with WHO standards, production, chemical % 100% 99% 99% 100% 99% 99%
+l l l l l l
+20j % compliance with WHO standards, production, biological % 100% 93% 93% 100% 98% 98%
+l l l l l l
+20k % compliance with WHO standards, consumer, chemical % 100% 98% 98% 100% 101% 101%
+l l l l l l
+20l % compliance with WHO standards, consumer, biological % 100% 95% 95% 100% 89% 89%
+Prepared By
+Production& Qaulity superintendent
+
+===== PAGE 6 TABLES 1 =====
+--- TABLE 1 rows=19 ---
+TECHNICAL DASHBOARD PRODUCTION AND WATER QUALITY														
+Apr-26 Monthly Cumulative Unit Target Actual % real. Target Actual % real.														
+			Monthly						Cumulative					
+		Unit				Target	Actual	% real.				Target	Actual	% real.
+DASHBOARD - WATER QUALITY														
+20a	Number of tests compared to budget, production, chemical	#	l	l	l	298	297	100%	l	l	l	2,980	2,979	100%
+20b	Number of tests compared to budget, production, biological	#	l	l	l	42	43	102%	l	l	l	420	421	100%
+20c	Number of tests compared to budget, consumer, chemical	#	l	l	l	312	304	97%	l	l	l	3,120	3,143	101%
+20d	Number of tests compared to budget, consumer, biological	#	l	l	l	134	131	98%	l	l	l	1,340	1,310	98%
+20e	Number of tests compared to budget, production, chemical	#	l	l	l	298	295	99%	l	l	l	2,980	2,921	98%
+20f	Number of tests compared to budget, production, biological	#	l	l	l	42	40	95%	l	l	l	420	411	98%
+20g	Number of tests compared to budget, consumer, chemical	#	l	l	l	312	304	97%	l	l	l	3,120	3,143	101%
+20h	Number of tests compared to budget, consumer, biological	#	l	l	l	134	125	93%	l	l	l	1,340	1,214	91%
+20i	% compliance with WHO standards, production, chemical	%	l	l	l	100%	99%	99%	l	l	l	100%	99%	99%
+20j	% compliance with WHO standards, production, biological	%	l	l	l	100%	93%	93%	l	l	l	100%	98%	98%
+20k	% compliance with WHO standards, consumer, chemical	%	l	l	l	100%	98%	98%	l	l	l	100%	101%	101%
+20l	% compliance with WHO standards, consumer, biological	%	l	l	l	100%	95%	95%	l	l	l	100%	89%	89%
+Prepared By Production& Qaulity superintendent														
+														

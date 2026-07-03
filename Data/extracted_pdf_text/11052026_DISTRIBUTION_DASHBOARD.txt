@@ -1,0 +1,247 @@
+FILE: C:\Users\icta\Desktop\programs\NWS CODEX\NAIVAWASCO\Data\11052026_DISTRIBUTION_DASHBOARD.pdf
+PAGES: 3
+
+
+===== PAGE 1 TEXT =====
+NAIVAWASS DISTRIBUTION DASHBOARD - NON-REVENUE WATER & ZONAL PERFORMANCE
+Apr-26
+Monthly Cumulative
+Unit Target Actual % real. Target Actual % real.
+GLOBAL PERFORMNCE
+REGIONAL NRW
+l l l l l l
+100 WATER AVAILABLE FOR SALES- REGIONS m3 233,508 170,799 73% 2,242,609 2,074,246 92%
+l l l l l l
+128a VOLUME WATER BILLED(CUSTOMERS-M3) m3 189,206 126,594 67% 1,758,464 1,546,285 88%
+l l l l l l
+128 GLOBAL NRW % 19% 26% 73% 22% 25% 85%
+CENTRAL REGION: CBD,CCCR,KABATI,SITE,KIHOTO,LAKEVIEW
+l l l l l l
+RA Volume Water Supplied m3 103,415 80,586 78% 1,043,382 994,434 95%
+l l l l l l
+RA2 Volume Water Sold m3 88,817 61,657 69% 866,485 787,660 91%
+l l l l l l
+RA3 NRW m3 14,598 18,929 77% 176,897 206,774 86%
+l l l l l l
+RA4 NRW % 14% 23% 60% 17% 21% 82%
+SOUTHERN REGION: MAI MAHIU,KAMERE,HELLSGATE
+l l l l l l
+RA6 (B) Volume Water Supplied m3 92,232 56,759 62% 832,347 692,084 83%
+l l l l l l
+RB2 Volume Water Sold m3 68,257 39,214 57% 586,871 473,283 81%
+l l l l l l
+RB3 (2) NRW m3 23,975 17,545 137% 245,476 218,801 112%
+l l l l l l
+RB4 NRW % 26% 31% 84% 30% 32% 94%
+EASTERN REGION: KAYOLE,GONDI, KINUNGI,NJONJORO
+l l l l l l
+RA6 (B) (2V)olume Water Supplied m3 37,862 33,454 88% 366,881 387,728 106%
+l l l l l l
+RB2 (3) Volume Water Sold m3 32,133 25,723 80% 305,108 285,342 94%
+l l l l l l
+RB3 (3) NRW m3 5,729 7,731 74% 61,773 102,386 60%
+l l l l l l
+RB4 (2) NRW % 15% 23% 65% 17% 26% 65%
+ZONE - CBD
+l l l l l l
+101 Volume Water Supplied m3 20,213 16,406 81% 206,414 202,136 98%
+l l l l l l
+108 Volume Water Sold m3 16,243 11,291 70% 161,885 153,016 95%
+l l l l l l
+122 NRW % 20% 31% 63% 22% 24% 89%
+ZONE - CCCR
+l l l l l l
+102 Volume Water Supplied m3 19,749 12,283 62% 194,026 187,293 97%
+l l l l l l
+109 Volume Water Sold m3 17,633 11,304 64% 165,868 154,602 93%
+
+===== PAGE 1 TABLES 1 =====
+--- TABLE 1 rows=31 ---
+NAIVAWASS DISTRIBUTION DASHBOARD - NON-REVENUE WATER & ZONAL PERFORMANCE														
+Apr-26 Monthly Cumulative Unit Target Actual % real. Target Actual % real.														
+			Monthly						Cumulative					
+		Unit				Target	Actual	% real.				Target	Actual	% real.
+GLOBAL PERFORMNCE														
+REGIONAL NRW														
+100	WATER AVAILABLE FOR SALES- REGIONS	m3	l	l	l	233,508	170,799	73%	l	l	l	2,242,609	2,074,246	92%
+128a	VOLUME WATER BILLED(CUSTOMERS-M3)	m3	l	l	l	189,206	126,594	67%	l	l	l	1,758,464	1,546,285	88%
+128	GLOBAL NRW	%	l	l	l	19%	26%	73%	l	l	l	22%	25%	85%
+CENTRAL REGION: CBD,CCCR,KABATI,SITE,KIHOTO,LAKEVIEW														
+RA	Volume Water Supplied	m3	l	l	l	103,415	80,586	78%	l	l	l	1,043,382	994,434	95%
+RA2	Volume Water Sold	m3	l	l	l	88,817	61,657	69%	l	l	l	866,485	787,660	91%
+RA3	NRW	m3	l	l	l	14,598	18,929	77%	l	l	l	176,897	206,774	86%
+RA4	NRW	%	l	l	l	14%	23%	60%	l	l	l	17%	21%	82%
+SOUTHERN REGION: MAI MAHIU,KAMERE,HELLSGATE														
+RA6 (B)	Volume Water Supplied	m3	l	l	l	92,232	56,759	62%	l	l	l	832,347	692,084	83%
+RB2	Volume Water Sold	m3	l	l	l	68,257	39,214	57%	l	l	l	586,871	473,283	81%
+RB3 (2)	NRW	m3	l	l	l	23,975	17,545	137%	l	l	l	245,476	218,801	112%
+RB4	NRW	%	l	l	l	26%	31%	84%	l	l	l	30%	32%	94%
+EASTERN REGION: KAYOLE,GONDI, KINUNGI,NJONJORO														
+RA6 (B) (	2V)olume Water Supplied	m3	l	l	l	37,862	33,454	88%	l	l	l	366,881	387,728	106%
+RB2 (3)	Volume Water Sold	m3	l	l	l	32,133	25,723	80%	l	l	l	305,108	285,342	94%
+RB3 (3)	NRW	m3	l	l	l	5,729	7,731	74%	l	l	l	61,773	102,386	60%
+RB4 (2)	NRW	%	l	l	l	15%	23%	65%	l	l	l	17%	26%	65%
+ZONE - CBD														
+101	Volume Water Supplied	m3	l	l	l	20,213	16,406	81%	l	l	l	206,414	202,136	98%
+108	Volume Water Sold	m3	l	l	l	16,243	11,291	70%	l	l	l	161,885	153,016	95%
+122	NRW	%	l	l	l	20%	31%	63%	l	l	l	22%	24%	89%
+ZONE - CCCR														
+102	Volume Water Supplied	m3	l	l	l	19,749	12,283	62%	l	l	l	194,026	187,293	97%
+109	Volume Water Sold	m3	l	l	l	17,633	11,304	64%	l	l	l	165,868	154,602	93%
+
+===== PAGE 2 TEXT =====
+NAIVAWASS DISTRIBUTION DASHBOARD - NON-REVENUE WATER & ZONAL PERFORMANCE
+Apr-26
+Monthly Cumulative
+Unit Target Actual % real. Target Actual % real.
+l l GlLOBAL PERFORMNCE l l l
+123 NRW % 11% 8% 134% 15% 17% 83%
+ZONE - LAKEVIEW
+l l l l l l
+104 Volume Water Supplied m3 25,593 19,831 77% 260,370 255,059 98%
+l l l l l l
+111 Volume Water Sold m3 21,741 14,687 68% 214,158 192,047 90%
+l l l l l l
+125 NRW % 15% 26% 58% 18% 25% 72%
+ZONE - KABATI
+l l l l l l
+103 Volume Water Supplied m3 16,724 13,446 80% 167,297 147,941 88%
+l l l l l l
+110 Volume Water Sold m3 14,250 10,870 76% 138,702 118,321 85%
+l l l l l l
+124 NRW % 15% 19% 77% 17% 20% 85%
+ZONE - SITE AND SERVICES
+l l l l l l
+105 Volume Water Supplied m3 12,166 10,704 88% 126,402 118,922 94%
+l l l l l l
+112 Volume Water Sold m3 10,862 8,218 76% 107,946 100,637 93%
+l l l l l l
+126 NRW % 11% 23% 46% 15% 15% 95%
+ZONE - HOPEWELL
+l l l l l l
+105B Volume Water Supplied m3 6,885 6,708 97% 68,078 65,106 96%
+l l l l l l
+112B Volume Water Sold m3 6,200 4,275 69% 59,490 55,231 93%
+l l l l l l
+126B NRW % 10% 36% 27% 13% 15% 83%
+ZONE - KAMERE
+l l l l l l
+106 Volume Water Supplied m3 9,932 8,368 84% 91,534 87,795 96%
+l l l l l l
+113 Volume Water Sold m3 8,919 7,062 79% 79,487 63,561 80%
+l l l l l l
+127 NRW % 10% 16% 65% 13% 28% 48%
+ZONE - HELLS GATE
+l l l l l l
+103 (3) Volume Water Supplied m3 42,597 30,617 72% 397,867 346,279 87%
+l l l l l l
+110 (3) Volume Water Sold m3 32,057 21,347 67% 292,034 245,388 84%
+l l l l l l
+124 (3) NRW % 25% 30% 82% 27% 29% 91%
+KIHOTO
+l l l l l l
+103 (2) Volume Water Supplied m3 2,085 1,208 58% 20,796 17,977 86%
+
+===== PAGE 2 TABLES 1 =====
+--- TABLE 1 rows=31 ---
+NAIVAWASS DISTRIBUTION DASHBOARD - NON-REVENUE WATER & ZONAL PERFORMANCE														
+Apr-26 Monthly Cumulative Unit Target Actual % real. Target Actual % real.														
+			Monthly						Cumulative					
+		Unit				Target	Actual	% real.				Target	Actual	% real.
+123	NRW	%	l	l	GlL	OBAL PERFO 11%	RMNCE 8%	134%	l	l	l	15%	17%	83%
+ZONE - LAKEVIEW														
+104	Volume Water Supplied	m3	l	l	l	25,593	19,831	77%	l	l	l	260,370	255,059	98%
+111	Volume Water Sold	m3	l	l	l	21,741	14,687	68%	l	l	l	214,158	192,047	90%
+125	NRW	%	l	l	l	15%	26%	58%	l	l	l	18%	25%	72%
+ZONE - KABATI														
+103	Volume Water Supplied	m3	l	l	l	16,724	13,446	80%	l	l	l	167,297	147,941	88%
+110	Volume Water Sold	m3	l	l	l	14,250	10,870	76%	l	l	l	138,702	118,321	85%
+124	NRW	%	l	l	l	15%	19%	77%	l	l	l	17%	20%	85%
+ZONE - SITE AND SERVICES														
+105	Volume Water Supplied	m3	l	l	l	12,166	10,704	88%	l	l	l	126,402	118,922	94%
+112	Volume Water Sold	m3	l	l	l	10,862	8,218	76%	l	l	l	107,946	100,637	93%
+126	NRW	%	l	l	l	11%	23%	46%	l	l	l	15%	15%	95%
+ZONE - HOPEWELL														
+105B	Volume Water Supplied	m3	l	l	l	6,885	6,708	97%	l	l	l	68,078	65,106	96%
+112B	Volume Water Sold	m3	l	l	l	6,200	4,275	69%	l	l	l	59,490	55,231	93%
+126B	NRW	%	l	l	l	10%	36%	27%	l	l	l	13%	15%	83%
+ZONE - KAMERE														
+106	Volume Water Supplied	m3	l	l	l	9,932	8,368	84%	l	l	l	91,534	87,795	96%
+113	Volume Water Sold	m3	l	l	l	8,919	7,062	79%	l	l	l	79,487	63,561	80%
+127	NRW	%	l	l	l	10%	16%	65%	l	l	l	13%	28%	48%
+ZONE - HELLS GATE														
+103 (3)	Volume Water Supplied	m3	l	l	l	42,597	30,617	72%	l	l	l	397,867	346,279	87%
+110 (3)	Volume Water Sold	m3	l	l	l	32,057	21,347	67%	l	l	l	292,034	245,388	84%
+124 (3)	NRW	%	l	l	l	25%	30%	82%	l	l	l	27%	29%	91%
+KIHOTO														
+103 (2)	Volume Water Supplied	m3	l	l	l	2,085	1,208	58%	l	l	l	20,796	17,977	86%
+
+===== PAGE 3 TEXT =====
+NAIVAWASS DISTRIBUTION DASHBOARD - NON-REVENUE WATER & ZONAL PERFORMANCE
+Apr-26
+Monthly Cumulative
+Unit Target Actual % real. Target Actual % real.
+l l GlLOBAL PERFORMNCE l l l
+110 (2) Volume Water Sold m3 1,888 1,012 54% 18,435 13,806 75%
+l l l l l l
+124 (2) NRW % 9% 16% 58% 11% 23% 49%
+KAYOLE
+l l l l l l
+103 (4) Volume Water Supplied m3 35,667 33,076 93% 352,140 384,491 109%
+l l l l l l
+110 (4) Volume Water Sold m3 30,481 25,545 84% 294,232 284,096 97%
+l l l l l l
+124 (4) NRW % 15% 23% 64% 16% 26% 63%
+MAI-MAHIU
+l l l l l l
+103 (5) Volume Water Supplied m3 32,872 12,942 39% 271,509 198,681 73%
+l l l l l l
+110 (5) Volume Water Sold m3 22,055 7,627 35% 166,251 120,340 72%
+l l l l l l
+124 (5) NRW % 33% 41% 80% 39% 39% 98%
+LONGONOT
+l l l l l l
+103 (7) Volume Water Supplied m3 6,830 4,832 71% 71,436 59,329 83%
+l l l l l l
+110 (7) Volume Water Sold m3 5,227 3,178 61% 49,099 43,994 90%
+l l l l l l
+124 (7) NRW % 23% 34% 69% 31% 26% 83%
+IHINDU
+l l l l l l
+103 (6) Volume Water Supplied m3 2,195 378 581% 14,741 3,237 22%
+l l l l l l
+110 (6) Volume Water Sold m3 1,652 178 928% 10,877 1,246 11%
+l l l l l l
+124 (6) NRW % 25% 53% 47% 26% 62% 43%
+Prepared by:
+Edward Mokua
+Water Disribution Sup
+
+===== PAGE 3 TABLES 1 =====
+--- TABLE 1 rows=26 ---
+NAIVAWASS DISTRIBUTION DASHBOARD - NON-REVENUE WATER & ZONAL PERFORMANCE														
+Apr-26 Monthly Cumulative Unit Target Actual % real. Target Actual % real.														
+			Monthly						Cumulative					
+		Unit				Target	Actual	% real.				Target	Actual	% real.
+110 (2)	Volume Water Sold	m3	l	l	GlL	OBAL PERFO 1,888	RMNCE 1,012	54%	l	l	l	18,435	13,806	75%
+124 (2)	NRW	%	l	l	l	9%	16%	58%	l	l	l	11%	23%	49%
+KAYOLE														
+103 (4)	Volume Water Supplied	m3	l	l	l	35,667	33,076	93%	l	l	l	352,140	384,491	109%
+110 (4)	Volume Water Sold	m3	l	l	l	30,481	25,545	84%	l	l	l	294,232	284,096	97%
+124 (4)	NRW	%	l	l	l	15%	23%	64%	l	l	l	16%	26%	63%
+MAI-MAHIU														
+103 (5)	Volume Water Supplied	m3	l	l	l	32,872	12,942	39%	l	l	l	271,509	198,681	73%
+110 (5)	Volume Water Sold	m3	l	l	l	22,055	7,627	35%	l	l	l	166,251	120,340	72%
+124 (5)	NRW	%	l	l	l	33%	41%	80%	l	l	l	39%	39%	98%
+LONGONOT														
+103 (7)	Volume Water Supplied	m3	l	l	l	6,830	4,832	71%	l	l	l	71,436	59,329	83%
+110 (7)	Volume Water Sold	m3	l	l	l	5,227	3,178	61%	l	l	l	49,099	43,994	90%
+124 (7)	NRW	%	l	l	l	23%	34%	69%	l	l	l	31%	26%	83%
+IHINDU														
+103 (6)	Volume Water Supplied	m3	l	l	l	2,195	378	581%	l	l	l	14,741	3,237	22%
+110 (6)	Volume Water Sold	m3	l	l	l	1,652	178	928%	l	l	l	10,877	1,246	11%
+124 (6)	NRW	%	l	l	l	25%	53%	47%	l	l	l	26%	62%	43%
+														
+														
+	Prepared by:													
+Edward Mokua Water Disribution Sup														
