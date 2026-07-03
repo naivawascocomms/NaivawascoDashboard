@@ -1,0 +1,85 @@
+NAIVAWASCO - MIGRATE SQLITE TO SUPABASE POSTGRES
+
+This backend requires a Supabase Postgres DATABASE_URL. It no longer falls back to SQLite when DATABASE_URL is missing.
+
+
+1. GET THE SUPABASE DATABASE CONNECTION STRING
+
+In Supabase:
+
+1. Open your project.
+2. Go to Project Settings.
+3. Open Database.
+4. Copy the Transaction pooler connection string.
+5. Replace [YOUR-PASSWORD] with the database password.
+6. Make sure the URL ends with sslmode=require.
+
+Example:
+
+postgresql://postgres.PROJECT_REF:DB_PASSWORD@aws-0-REGION.pooler.supabase.com:6543/postgres?sslmode=require
+
+
+2. CREATE BACKEND .env
+
+Create:
+
+naivawass_dashboard/.env
+
+Add:
+
+DATABASE_URL=postgresql://postgres.PROJECT_REF:DB_PASSWORD@aws-0-REGION.pooler.supabase.com:6543/postgres?sslmode=require
+DJANGO_DEBUG=True
+DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
+
+
+3. EXPORT CURRENT SQLITE DATA
+
+Use an older checkout or a temporary settings override if you need another SQLite export. The current backend configuration is Supabase-only and will not run without DATABASE_URL.
+
+From naivawass_dashboard:
+
+venv\Scripts\python.exe manage.py dumpdata --natural-foreign --natural-primary --exclude contenttypes --exclude auth.permission --indent 2 -o sqlite_export.json
+
+
+4. INSTALL POSTGRES DRIVER
+
+From naivawass_dashboard:
+
+venv\Scripts\python.exe -m pip install -r requirements.txt
+
+
+5. CREATE TABLES IN SUPABASE
+
+Make sure .env contains DATABASE_URL, then run:
+
+venv\Scripts\python.exe manage.py migrate
+
+
+6. IMPORT SQLITE DATA INTO SUPABASE
+
+Run:
+
+venv\Scripts\python.exe manage.py loaddata sqlite_export.json
+
+
+7. VERIFY
+
+Run:
+
+venv\Scripts\python.exe manage.py check
+venv\Scripts\python.exe manage.py shell -c "from django.contrib.auth import get_user_model; print(get_user_model().objects.count())"
+
+
+8. RUN BACKEND AGAINST SUPABASE
+
+Run:
+
+venv\Scripts\python.exe manage.py runserver
+
+
+IMPORTANT NOTES
+
+- Do not commit .env because it contains the Supabase database password.
+- Django model save methods still run for writes made through Django.
+- Direct Android writes to Supabase do not run Django save methods. Keep mobile writes limited to tables whose calculations are handled in the app or database.
+- Supabase Row Level Security does not apply to Django's direct Postgres connection. It applies to Supabase API/Auth clients such as the Android app.

@@ -1,0 +1,19 @@
+# Local environment files with secrets
+.env
+.env.*
+!compose/.env.prod.example
+!compose/.env.staging.example
+
+# Local backup artifacts
+backups/
+*.dump
+*.dump.gz
+*.sql
+*.sql.gz
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+

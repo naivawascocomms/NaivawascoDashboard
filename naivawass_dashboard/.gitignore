@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+*.sqlite3
+venv/
+.env
+*.log
+local_postgres_export*.json
+sqlite_export*.json
+fixture_chunks/
+.env.example

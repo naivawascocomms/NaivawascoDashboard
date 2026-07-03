@@ -1,0 +1,42 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - backend-prod-image
+      - frontend-prod-image
+
+concurrency:
+  group: naivawasco-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, naivawasco-prod]
+    environment:
+      name: production
+      url: https://app.your-domain.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy compose file
+        run: |
+          mkdir -p /opt/naivawasco/prod
+          cp compose/docker-compose.prod.yml /opt/naivawasco/prod/docker-compose.yml
+
+      - name: Login to GHCR
+        env:
+          GHCR_READ_TOKEN: ${{ secrets.GHCR_READ_TOKEN }}
+        run: |
+          if [ -n "$GHCR_READ_TOKEN" ]; then
+            echo "$GHCR_READ_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          else
+            echo "GHCR_READ_TOKEN not set; skipping registry login."
+          fi
+
+      - name: Deploy production
+        run: bash scripts/deploy.sh /opt/naivawasco/prod naivawasco-prod
+
+      - name: Healthcheck
+        run: bash scripts/healthcheck.sh https://app.your-domain.com
