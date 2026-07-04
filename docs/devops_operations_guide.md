@@ -31,15 +31,15 @@ Ubuntu Server 24.04 LTS
 Recommended public endpoints:
 
 ```text
-https://app.naivawasco.example.com          Web frontend
-https://app.naivawasco.example.com/api      Django API for web and Android
-https://app.naivawasco.example.com/admin    Django admin, protected by Django and Cloudflare Access
+https://app.naivawasco.online          Web frontend
+https://app.naivawasco.online/api      Django API for web and Android
+https://app.naivawasco.online/admin    Django admin, protected by Django and Cloudflare Access
 ```
 
 Use one hostname for frontend and API. This avoids CORS complexity because the frontend and API share the same origin. The mobile app should use:
 
 ```env
-EXPO_PUBLIC_API_BASE_URL=https://app.naivawasco.example.com/api
+EXPO_PUBLIC_API_BASE_URL=https://app.naivawasco.online/api
 ```
 
 ## 2. Recommended Technologies
@@ -304,7 +304,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
       - ./backups:/backups
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
@@ -362,9 +362,9 @@ POSTGRES_USER=naivawasco
 POSTGRES_PASSWORD=<long-random-password>
 
 DJANGO_SECRET_KEY=<long-random-secret>
-DJANGO_ALLOWED_HOSTS=app.naivawasco.example.com,localhost,127.0.0.1
-DJANGO_CORS_ALLOWED_ORIGINS=https://app.naivawasco.example.com
-DJANGO_CSRF_TRUSTED_ORIGINS=https://app.naivawasco.example.com
+DJANGO_ALLOWED_HOSTS=app.naivawasco.online,localhost,127.0.0.1
+DJANGO_CORS_ALLOWED_ORIGINS=https://app.naivawasco.online
+DJANGO_CSRF_TRUSTED_ORIGINS=https://app.naivawasco.online
 DATABASE_CONN_MAX_AGE=60
 GUNICORN_WORKERS=3
 
@@ -376,7 +376,7 @@ CLOUDFLARE_TUNNEL_TOKEN=<cloudflare-tunnel-token>
 
 ## 8. Cloudflare Tunnel Setup
 
-Recommended: use a Cloudflare-managed tunnel with a token, then run `cloudflared` as a Docker Compose service. The frontend and backend stay internal-only; Cloudflare is the only public ingress.
+Recommended: use a Cloudflare-managed tunnel with a token, then run `cloudflared` as a Docker Compose service. The frontend and backend stay internal-only; Cloudflare is the only public ingress. For dashboard clicks and the full hostname setup, see `docs/cloudflare_tunnel_setup.md`.
 
 Prerequisites:
 
@@ -385,72 +385,27 @@ Prerequisites:
 - Ubuntu server has outbound internet access.
 - Server can reach Cloudflare. If restricted, verify outbound connectivity on Cloudflare's tunnel ports.
 
-### 8.1 Create Tunnel
+### 8.1 Quick Reference
 
-In Cloudflare dashboard:
+Use `docs/cloudflare_tunnel_setup.md` for the current sequence. The key operational points are:
 
-1. Go to **Zero Trust** or **Networking > Tunnels**.
-2. Create a tunnel named `naivawasco-prod`.
-3. Choose Docker or Linux as the connector type.
-4. Copy the tunnel token.
-5. Store the token only in `/opt/naivawasco/prod/.env`.
-
-### 8.2 Publish Routes
-
-Add a public hostname:
-
-```text
-Hostname: app.naivawasco.example.com
-Service:  http://frontend:80
-```
-
-If using dashboard-managed tunnel routes from a Docker connector, Cloudflare handles the DNS CNAME to the tunnel. If using local management, the equivalent command is:
-
-```bash
-cloudflared tunnel route dns <UUID-or-NAME> app.naivawasco.example.com
-```
-
-For staging:
-
-```text
-Hostname: staging.naivawasco.example.com
-Service:  http://frontend:80
-```
-
-Use a separate tunnel or at least a separate hostname route. Separate tunnels are cleaner for production/staging isolation.
-
-If you are deploying the current monorepo with the root Compose files, pair them with `docker-compose.cloudflare.yml` so Docker does not publish host ports.
-
-### 8.3 Protect Admin and Staging
-
-Use Cloudflare Access policies:
-
-```text
-Protect: https://app.naivawasco.example.com/admin/*
-Allow: approved admin emails only
-```
-
-For staging:
-
-```text
-Protect: https://staging.naivawasco.example.com/*
-Allow: internal staff/admin emails only
-```
-
-Do not rely on Cloudflare Access alone. Django authentication and permissions still apply.
+- Run `docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml --profile cloudflare up -d`.
+- Create the tunnel in Cloudflare Zero Trust.
+- Route the public hostname to `http://frontend:80`.
+- Protect `/admin/*` with Cloudflare Access.
 
 ### 8.4 Mobile App URL
 
 For production APK/AAB builds:
 
 ```env
-EXPO_PUBLIC_API_BASE_URL=https://app.naivawasco.example.com/api
+EXPO_PUBLIC_API_BASE_URL=https://app.naivawasco.online/api
 ```
 
 For staging builds:
 
 ```env
-EXPO_PUBLIC_API_BASE_URL=https://staging.naivawasco.example.com/api
+EXPO_PUBLIC_API_BASE_URL=https://staging.naivawasco.online/api
 ```
 
 ## 9. Backend Repository CI/CD
@@ -668,8 +623,8 @@ EXPO_TOKEN
 Recommended environment variables:
 
 ```text
-EXPO_PUBLIC_API_BASE_URL=https://staging.naivawasco.example.com/api
-EXPO_PUBLIC_API_BASE_URL=https://app.naivawasco.example.com/api
+EXPO_PUBLIC_API_BASE_URL=https://staging.naivawasco.online/api
+EXPO_PUBLIC_API_BASE_URL=https://app.naivawasco.online/api
 ```
 
 Recommended `.github/workflows/ci.yml`:
@@ -825,7 +780,7 @@ jobs:
     runs-on: [self-hosted, naivawasco-prod]
     environment:
       name: production
-      url: https://app.naivawasco.example.com
+      url: https://app.naivawasco.online
     steps:
       - uses: actions/checkout@v4
       - name: Copy compose file
@@ -837,8 +792,8 @@ jobs:
         run: ./scripts/deploy.sh /opt/naivawasco/prod naivawasco-prod
       - name: Healthcheck
         run: |
-          curl -fsS https://app.naivawasco.example.com/ >/dev/null
-          curl -fsS https://app.naivawasco.example.com/api/ >/dev/null || true
+          curl -fsS https://app.naivawasco.online/ >/dev/null
+          curl -fsS https://app.naivawasco.online/api/ >/dev/null || true
 ```
 
 Create `GHCR_READ_TOKEN` as a production environment secret if the packages are private.
@@ -864,7 +819,7 @@ jobs:
     runs-on: [self-hosted, naivawasco-prod]
     environment:
       name: staging
-      url: https://staging.naivawasco.example.com
+      url: https://staging.naivawasco.online
     steps:
       - uses: actions/checkout@v4
       - run: cp compose/docker-compose.staging.yml /opt/naivawasco/staging/docker-compose.yml
@@ -1038,8 +993,8 @@ docker compose -p naivawasco-prod logs --tail=100 cloudflared
 Recommended monitoring:
 
 - Uptime Kuma on LAN or another server.
-- HTTP check for `https://app.naivawasco.example.com`.
-- HTTP check for `https://app.naivawasco.example.com/api/`.
+- HTTP check for `https://app.naivawasco.online`.
+- HTTP check for `https://app.naivawasco.online/api/`.
 - Disk usage alert for `/var/lib/docker` and `/var/backups`.
 - Cloudflare tunnel status alert.
 
@@ -1143,7 +1098,7 @@ docker compose -p naivawasco-prod logs --tail=100 cloudflared
 Confirm:
 
 ```bash
-curl -I https://app.naivawasco.example.com
+curl -I https://app.naivawasco.online
 ```
 
 ## 19. Essential Pre-Live Checklist

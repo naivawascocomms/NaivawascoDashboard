@@ -8,6 +8,7 @@ Use this document first. The other deployment documents provide deeper architect
 
 - `deployment-docker.md` - short LAN deployment guide
 - `docs/local_server_hosting_roadmap.md` - phased hosting roadmap
+- `docs/cloudflare_tunnel_setup.md` - exact Cloudflare dashboard and tunnel steps
 - `docs/devops_operations_guide.md` - Cloudflare, CI/CD, backups, and operations detail
 - `naivawasco-infra/` - staging/production Compose files and deployment scripts
 
@@ -185,47 +186,7 @@ Verify:
 
 ## 8. Add Cloudflare Tunnel
 
-After local validation, create a Cloudflare-managed tunnel and run the `cloudflared` connector through Docker Compose with the `cloudflare` profile and the Cloudflare override file.
-
-For the image-based staging/production path, the ready-made Compose files are:
-
-- `naivawasco-infra/compose/docker-compose.prod.yml`
-- `naivawasco-infra/compose/docker-compose.staging.yml`
-
-Recommended public hostnames:
-
-```text
-https://app.your-domain.com
-https://staging.your-domain.com
-```
-
-Both should route to:
-
-```text
-http://frontend:80
-```
-
-Use Cloudflare Access to protect:
-
-```text
-https://app.your-domain.com/admin/*
-https://staging.your-domain.com/*
-```
-
-Example server `.env` additions for the tunnel:
-
-```env
-DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,app.your-domain.com
-DJANGO_CORS_ALLOWED_ORIGINS=https://app.your-domain.com
-DJANGO_CSRF_TRUSTED_ORIGINS=https://app.your-domain.com
-CLOUDFLARE_TUNNEL_TOKEN=<cloudflare-tunnel-token>
-```
-
-Start the tunnel profile with:
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml --profile cloudflare up -d
-```
+After local validation, follow `docs/cloudflare_tunnel_setup.md` for the exact Cloudflare dashboard and tunnel steps.
 
 ## 9. When To Move To naivawasco-infra
 
