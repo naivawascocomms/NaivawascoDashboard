@@ -5,6 +5,20 @@ import { AppButton } from '../../components/AppButton';
 import { TextField } from '../../components/TextField';
 import { colors } from '../../theme/colors';
 import { useAuth } from '../../auth/AuthProvider';
+import { ApiError } from '../../api/errors';
+import { getApiBaseUrl } from '../../api/client';
+
+function loginErrorMessage(error: unknown) {
+  if (error instanceof ApiError) {
+    if (error.status === 401) return 'Invalid Django username or password.';
+    if (error.status === 404) return `Backend endpoint not found at ${getApiBaseUrl()}.`;
+    if (typeof error.payload === 'object' && error.payload !== null) {
+      return JSON.stringify(error.payload);
+    }
+    return String(error.payload || `Login failed with status ${error.status}.`);
+  }
+  return `Cannot reach backend at ${getApiBaseUrl()}. Check Wi-Fi and Windows Firewall.`;
+}
 
 export function LoginScreen() {
   const { signIn } = useAuth();
@@ -22,8 +36,8 @@ export function LoginScreen() {
     try {
       setIsSubmitting(true);
       await signIn(username.trim(), password);
-    } catch {
-      setError('Login failed. Check your username and password.');
+    } catch (error) {
+      setError(loginErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }

@@ -13,20 +13,6 @@ export interface DMA {
   meterCount: number;
 }
 
-export interface DistributionKPI {
-  label: string;
-  value: number;
-  unit: string;
-  target?: number;
-  percentRealized?: number;
-  trend?: 'up' | 'down' | 'stable';
-  status?: 'good' | 'warning' | 'critical';
-  comparison?: {
-    previousPeriod: number;
-    change: number;
-  };
-}
-
 export interface GlobalNRWMetrics {
   waterAvailed: number;
   waterBilled: number;

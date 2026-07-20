@@ -21,6 +21,7 @@ from .models import (
     WaterMeterReading,
 )
 from .permissions import CanManageMeterReadingAssignments
+from .permissions import CanManageUsers
 from .serializers import (
     DistributionWaterMeterAssignmentSerializer,
     EnergyMeterReadingCreateSerializer,
@@ -29,6 +30,8 @@ from .serializers import (
     MeterReadingAssignmentSerializer,
     ProductionEnergyMeterAssignmentSerializer,
     ProductionWaterMeterAssignmentSerializer,
+    UserManagementSerializer,
+    UserPasswordSerializer,
     UserProfileSerializer,
     WaterMeterReadingCreateSerializer,
     WaterMeterReadingSerializer,
@@ -96,6 +99,43 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
         )
         serializer = self.get_serializer(profile)
         return Response(serializer.data)
+
+
+class UserManagementViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.select_related('metering_profile').all()
+    serializer_class = UserManagementSerializer
+    permission_classes = [CanManageUsers]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['is_active', 'is_staff', 'is_superuser', 'metering_profile__role']
+    search_fields = ['username', 'first_name', 'last_name', 'email', 'metering_profile__phone_number']
+    ordering_fields = ['username', 'first_name', 'last_name', 'email', 'date_joined', 'last_login']
+    ordering = ['username']
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        if user == request.user:
+            return Response(
+                {'detail': 'You cannot deactivate your own user account.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        user.is_active = False
+        user.save(update_fields=['is_active'])
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def set_password(self, request, pk=None):
+        user = self.get_object()
+        serializer = UserPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user.set_password(serializer.validated_data['password'])
+        user.save(update_fields=['password'])
+        return Response({'detail': 'Password updated.'})
 
 
 class WaterMeterReadingViewSet(viewsets.ModelViewSet):

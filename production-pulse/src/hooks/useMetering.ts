@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { meteringService } from '@/services/meteringService';
+import { meteringService, type ManagedUserParams } from '@/services/meteringService';
 
 type QueryOptions = {
   enabled?: boolean;
@@ -12,6 +12,69 @@ export const useMyMeteringProfile = () => {
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
+  });
+};
+
+export const useManagedUsers = (params?: ManagedUserParams, options?: QueryOptions) => {
+  return useQuery({
+    queryKey: ['managed-users', params],
+    queryFn: () => meteringService.getManagedUsers(params),
+    enabled: options?.enabled ?? true,
+    staleTime: 60 * 1000,
+  });
+};
+
+export const useCurrentManagedUser = (options?: QueryOptions) => {
+  return useQuery({
+    queryKey: ['managed-users', 'me'],
+    queryFn: () => meteringService.getCurrentManagedUser(),
+    enabled: options?.enabled ?? true,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+};
+
+export const useCreateManagedUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: meteringService.createManagedUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['managed-users'] });
+      queryClient.invalidateQueries({ queryKey: ['metering-user-profiles'] });
+    },
+  });
+};
+
+export const useUpdateManagedUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: meteringService.updateManagedUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['managed-users'] });
+      queryClient.invalidateQueries({ queryKey: ['metering-user-profiles'] });
+      queryClient.invalidateQueries({ queryKey: ['metering-profile', 'me'] });
+    },
+  });
+};
+
+export const useDeactivateManagedUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: meteringService.deactivateManagedUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['managed-users'] });
+      queryClient.invalidateQueries({ queryKey: ['metering-user-profiles'] });
+    },
+  });
+};
+
+export const useSetManagedUserPassword = () => {
+  return useMutation({
+    mutationFn: meteringService.setManagedUserPassword,
   });
 };
 

@@ -26,10 +26,6 @@ services:
       DJANGO_CORS_ALLOWED_ORIGINS: ${DJANGO_CORS_ALLOWED_ORIGINS:-http://localhost:8080,http://127.0.0.1:8080}
       DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-}
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-change-this-password}@db:5432/${POSTGRES_DB:-naivawasco_local}?sslmode=disable
-      MOBILE_SUPABASE_DATABASE_URL: ${MOBILE_SUPABASE_DATABASE_URL:-}
-      MOBILE_SUPABASE_URL: ${MOBILE_SUPABASE_URL:-}
-      MOBILE_SUPABASE_SERVICE_ROLE_KEY: ${MOBILE_SUPABASE_SERVICE_ROLE_KEY:-}
-      MOBILE_SUPABASE_DEFAULT_PASSWORD: ${MOBILE_SUPABASE_DEFAULT_PASSWORD:-}
     depends_on:
       db:
         condition: service_healthy
@@ -59,28 +55,6 @@ services:
     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN:-}
     depends_on:
       - frontend
-
-  mobile-sync:
-    build:
-      context: ./naivawass_dashboard
-    restart: unless-stopped
-    environment:
-      DJANGO_DEBUG: ${DJANGO_DEBUG:-False}
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-this-secret-key}
-      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
-      DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-change-this-password}@db:5432/${POSTGRES_DB:-naivawasco_local}?sslmode=disable
-      MOBILE_SUPABASE_DATABASE_URL: ${MOBILE_SUPABASE_DATABASE_URL:-}
-    depends_on:
-      db:
-        condition: service_healthy
-    command: >
-      sh -c "if [ -z \"$${MOBILE_SUPABASE_DATABASE_URL}\" ]; then
-      echo 'Mobile Supabase sync disabled: MOBILE_SUPABASE_DATABASE_URL is not set.';
-      tail -f /dev/null;
-      else
-      python manage.py sync_mobile_supabase --pull-submissions --loop --interval ${MOBILE_SYNC_INTERVAL:-10};
-      fi"
 
 volumes:
   postgres_data:

@@ -25,17 +25,6 @@ export interface EnergyData {
   costKes: number;
 }
 
-export interface ProductionKPI {
-  label: string;
-  value: number;
-  unit: string;
-  target?: number;
-  percentRealized?: number;
-  trend?: 'up' | 'down' | 'stable';
-  status?: 'good' | 'warning' | 'critical';
-  icon?: string;
-}
-
 export interface SourcePerformance {
   id: string;
   name: string;

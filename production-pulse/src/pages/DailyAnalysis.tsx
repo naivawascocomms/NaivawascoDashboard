@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { format, parseISO, subDays } from 'date-fns';
-import { Calendar, CalendarIcon } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { useDailyAnalysis } from '@/hooks/useDistribution';
-import { DailyKPICard } from '@/components/daily/DailyKPICard';
+import { KpiCard } from '@/components/kpi/KpiCard';
+import { PageToolbar } from '@/components/layout/PageToolbar';
 import { RegionalBreakdown } from '@/components/daily/RegionalBreakdown';
 import { ProductionTable } from '@/components/daily/ProductionTable';
 import { SupplyTable } from '@/components/daily/SupplyTable';
@@ -10,7 +11,7 @@ import { DailyTrendChart } from '@/components/daily/DailyTrendChart';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Card, CardContent } from '@/components/ui/card';
+import { ErrorState, LoadingState } from '@/components/layout/QueryState';
 import { cn } from '@/lib/utils';
 
 function toApiDate(value: Date) {
@@ -43,7 +44,7 @@ export default function DailyAnalysis() {
     [dateFrom, dateTo],
   );
 
-  const { data, isLoading, isError } = useDailyAnalysis(params, {
+  const { data, isLoading, isError, refetch } = useDailyAnalysis(params, {
     refetchOnWindowFocus: false,
   });
 
@@ -76,18 +77,7 @@ export default function DailyAnalysis() {
   return (
     <div className="min-h-screen bg-gradient-surface">
       <div className="container py-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <Calendar className="w-6 h-6 text-primary" />
-              Daily Analysis
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Daily production output and supply to distribution by region and zone
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <PageToolbar className="mb-6">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">From:</span>
               <Popover>
@@ -151,65 +141,60 @@ export default function DailyAnalysis() {
                 </PopoverContent>
               </Popover>
             </div>
-          </div>
-        </div>
+        </PageToolbar>
 
         {isLoading && !data ? (
-          <Card className="mb-6">
-            <CardContent className="py-10 text-sm text-muted-foreground">
-              Loading daily analysis...
-            </CardContent>
-          </Card>
+          <LoadingState label="Loading daily analysis…" className="mb-6" />
         ) : null}
 
         {isError ? (
-          <Card className="mb-6 border-destructive/30">
-            <CardContent className="py-10 text-sm text-destructive">
-              Daily analysis data could not be loaded.
-            </CardContent>
-          </Card>
+          <ErrorState
+            title="Daily analysis data could not be loaded."
+            onRetry={() => refetch()}
+            className="mb-6"
+          />
         ) : null}
 
         {summary ? (
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
-              <DailyKPICard
+              <KpiCard
                 label="Total Production"
                 value={summary.total_production}
                 unit="m3"
                 status="good"
               />
-              <DailyKPICard
+              <KpiCard
                 label="Total Supply"
                 value={summary.total_supply}
                 unit="m3"
                 status="good"
               />
-              <DailyKPICard
+              <KpiCard
                 label="Total Collection"
                 value={summary.total_collection}
                 unit="KES"
                 status="good"
               />
-              <DailyKPICard
+              <KpiCard
                 label="Gap"
                 value={summary.gap}
                 unit="m3"
                 status={getGapStatus(Math.abs(summary.gap_percentage))}
               />
-              <DailyKPICard
+              <KpiCard
                 label="Gap %"
                 value={summary.gap_percentage}
                 unit="%"
                 status={getGapStatus(Math.abs(summary.gap_percentage))}
               />
-              <DailyKPICard
+              <KpiCard
                 label="Regions"
                 value={summary.total_regions}
                 unit="active"
                 status="good"
               />
-              <DailyKPICard
+              <KpiCard
                 label="Days"
                 value={summary.days}
                 unit="selected"

@@ -83,6 +83,134 @@ class WorkbookMeterNameParsingTests(TestCase):
         )
 
 
+class UserManagementApiTests(APITestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser(username='admin', password='pass1234')
+        self.staff = User.objects.create_user(username='staff', password='pass1234', is_staff=True)
+        self.operator = User.objects.create_user(username='operator', password='pass1234')
+
+    def test_non_superuser_cannot_list_managed_users(self):
+        self.client.force_authenticate(user=self.operator)
+
+        response = self.client.get('/api/metering/users/')
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_superuser_can_create_user_with_metering_profile(self):
+        self.client.force_authenticate(user=self.admin)
+
+        response = self.client.post(
+            '/api/metering/users/',
+            {
+                'username': 'reader1',
+                'password': 'readpass123',
+                'first_name': 'Reader',
+                'last_name': 'One',
+                'email': 'reader@example.com',
+                'role': 'PLUMBER',
+                'phone_number': '+254700000001',
+                'profile_notes': 'Distribution field team',
+                'is_active': True,
+            },
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 201)
+        user = User.objects.get(username='reader1')
+        self.assertTrue(user.check_password('readpass123'))
+        self.assertEqual(user.first_name, 'Reader')
+        self.assertEqual(user.metering_profile.role, 'PLUMBER')
+        self.assertEqual(user.metering_profile.phone_number, '+254700000001')
+        self.assertEqual(user.metering_profile.notes, 'Distribution field team')
+        self.assertEqual(response.data['profile']['role'], 'PLUMBER')
+
+    def test_staff_cannot_create_managed_users(self):
+        self.client.force_authenticate(user=self.staff)
+
+        response = self.client.post(
+            '/api/metering/users/',
+            {
+                'username': 'privileged',
+                'password': 'pass1234',
+                'role': 'PUMP_OPERATOR',
+            },
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(User.objects.filter(username='privileged').exists())
+
+    def test_staff_cannot_manage_accounts(self):
+        self.client.force_authenticate(user=self.staff)
+
+        response = self.client.patch(
+            f'/api/metering/users/{self.admin.id}/',
+            {'first_name': 'Changed'},
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_superuser_can_update_profile_without_resetting_unsent_fields(self):
+        user = User.objects.create_user(username='reader2', password='pass1234')
+        profile = user.metering_profile
+        profile.role = 'PUMP_OPERATOR'
+        profile.phone_number = '+254700000002'
+        profile.notes = 'Original notes'
+        profile.save(update_fields=['role', 'phone_number', 'notes', 'updated_at'])
+        self.client.force_authenticate(user=self.admin)
+
+        response = self.client.patch(
+            f'/api/metering/users/{user.id}/',
+            {
+                'first_name': 'Updated',
+                'role': 'PLUMBER',
+            },
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        user.refresh_from_db()
+        profile.refresh_from_db()
+        self.assertEqual(user.first_name, 'Updated')
+        self.assertEqual(profile.role, 'PLUMBER')
+        self.assertEqual(profile.phone_number, '+254700000002')
+        self.assertEqual(profile.notes, 'Original notes')
+
+    def test_set_password_updates_login_password(self):
+        user = User.objects.create_user(username='reader3', password='oldpass123')
+        self.client.force_authenticate(user=self.admin)
+
+        response = self.client.post(
+            f'/api/metering/users/{user.id}/set_password/',
+            {'password': 'newpass123'},
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        user.refresh_from_db()
+        self.assertTrue(user.check_password('newpass123'))
+
+    def test_delete_soft_deactivates_user(self):
+        user = User.objects.create_user(username='reader4', password='pass1234')
+        self.client.force_authenticate(user=self.admin)
+
+        response = self.client.delete(f'/api/metering/users/{user.id}/')
+
+        self.assertEqual(response.status_code, 200)
+        user.refresh_from_db()
+        self.assertFalse(user.is_active)
+
+    def test_me_returns_current_admin_profile(self):
+        self.client.force_authenticate(user=self.admin)
+
+        response = self.client.get('/api/metering/users/me/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['username'], 'admin')
+        self.assertEqual(response.data['profile']['role'], self.admin.metering_profile.role)
+
+
 class MeterReadingAccessControlTests(APITestCase):
     def setUp(self):
         self.production_region = Region.objects.create(name='Production Central', code='PCENT')

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
+import { isAxiosError } from "axios";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 import { authService } from "@/services/authService";
 import { isAuthenticated } from "@/services/api";
@@ -27,11 +28,11 @@ export default function Login() {
     try {
       await authService.login({ username, password });
       window.location.href = "/";
-    } catch (err: any) {
-      const message =
-        err?.response?.data?.detail ||
-        "Login failed. Please check your username and password.";
-      setError(message);
+    } catch (err) {
+      const detail = isAxiosError<{ detail?: string }>(err)
+        ? err.response?.data?.detail
+        : undefined;
+      setError(detail || "Login failed. Please check your username and password.");
     } finally {
       setSubmitting(false);
     }
@@ -85,6 +86,7 @@ export default function Login() {
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
                     className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />

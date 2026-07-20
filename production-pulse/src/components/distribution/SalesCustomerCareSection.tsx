@@ -11,7 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import { FinanceKPICard } from '@/components/finance/FinanceKPICard';
+import { KpiCard } from '@/components/kpi/KpiCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   useCommercialDashboard,
@@ -437,10 +437,10 @@ export function SalesCustomerCareSection({
         </div>
       </div>
 
-      <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 animate-fade-in">
+      <div className="rounded-xl border border-success/20 bg-success/10 p-4 animate-fade-in">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Receipt className="w-6 h-6 text-emerald-500" />
+            <Receipt className="w-6 h-6 text-success" />
             <div>
               <p className="text-sm text-muted-foreground">Monthly Water & Sewer Sales</p>
               <p className="text-2xl font-bold mono-value">{formatCompact(summary.totalSalesMonthly)} KES</p>
@@ -474,7 +474,7 @@ export function SalesCustomerCareSection({
         </h3>
         <div className="data-grid">
           {monthlyKpis.map((kpi, idx) => (
-            <FinanceKPICard key={kpi.label} {...kpi} delay={idx * 60} />
+            <KpiCard key={kpi.label} {...kpi} delay={idx * 60} />
           ))}
         </div>
       </section>

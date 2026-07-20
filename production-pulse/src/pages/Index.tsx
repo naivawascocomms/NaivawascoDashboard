@@ -1,27 +1,10 @@
-import { useMemo, useState } from 'react';
-import {
-  AlertTriangle,
-  Banknote,
-  BarChart3,
-  BookOpen,
-  Building2,
-  Calendar,
-  ClipboardList,
-  Droplets,
-  Factory,
-  FileText,
-  HandCoins,
-  HardHat,
-  LifeBuoy,
-  Menu,
-  ReceiptText,
-  Settings,
-  ShieldCheck,
-  Users,
-  WalletCards,
-} from 'lucide-react';
+import { Suspense, useEffect, useState } from 'react';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { useTheme } from 'next-themes';
+import { BarChart3, Building2, Loader2, Menu, Moon, Sun } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+
 import {
   Sidebar,
   SidebarContent,
@@ -41,180 +24,13 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
-
-import DailyAnalysis from './DailyAnalysis';
-import DataEntry from './DataEntry';
-import DistributionDashboard from './DistributionDashboard';
-import FinanceDashboard from './FinanceDashboard';
-import IncidentReporting from './IncidentReporting';
-import ProductionDashboard from './ProductionDashboard';
-import ProjectsDashboard from './ProjectsDashboard';
-import Reports from './Reports';
-import WaterBalanceSettings from './WaterBalanceSettings';
-
-type DashboardType =
-  | 'daily'
-  | 'production'
-  | 'projects'
-  | 'sanitation'
-  | 'waterDistribution'
-  | 'salesCustCare'
-  | 'propoor'
-  | 'revenue'
-  | 'billing'
-  | 'accounts'
-  | 'incidents'
-  | 'reports'
-  | 'data'
-  | 'waterBalance'
-  | 'systemSettings';
-
-type MenuItem = {
-  id: DashboardType;
-  label: string;
-  icon: typeof Calendar;
-  status?: 'active' | 'planned';
-  description?: string;
-};
-
-type MenuGroup = {
-  label: string;
-  items: MenuItem[];
-};
-
-const menuGroups: MenuGroup[] = [
-  {
-    label: 'Technical',
-    items: [
-      { id: 'production', label: 'Production', icon: Factory, status: 'active' },
-      { id: 'projects', label: 'Projects', icon: HardHat, status: 'active' },
-      { id: 'sanitation', label: 'Sanitation', icon: ShieldCheck, status: 'planned' },
-    ],
-  },
-  {
-    label: 'Distribution',
-    items: [
-      { id: 'waterDistribution', label: 'Water Distribution', icon: Droplets, status: 'active' },
-      { id: 'salesCustCare', label: 'Sales & CustCare', icon: Users, status: 'active' },
-      { id: 'propoor', label: 'Propoor', icon: LifeBuoy, status: 'planned' },
-    ],
-  },
-  {
-    label: 'Finance',
-    items: [
-      { id: 'revenue', label: 'Revenue', icon: Banknote, status: 'active' },
-      { id: 'billing', label: 'Billing', icon: ReceiptText, status: 'planned' },
-      { id: 'accounts', label: 'Accounts', icon: WalletCards, status: 'planned' },
-    ],
-  },
-  {
-    label: 'Shared',
-    items: [
-      { id: 'daily', label: 'Daily Analysis', icon: Calendar, status: 'active' },
-      { id: 'incidents', label: 'Incidents', icon: AlertTriangle, status: 'active' },
-      { id: 'reports', label: 'Reports', icon: FileText, status: 'active' },
-    ],
-  },
-  {
-    label: 'Administration',
-    items: [
-      { id: 'data', label: 'Data & Imports', icon: ClipboardList, status: 'active' },
-    ],
-  },
-  {
-    label: 'Settings',
-    items: [
-      { id: 'waterBalance', label: 'Water Balancing', icon: Settings, status: 'active' },
-      { id: 'systemSettings', label: 'System Settings', icon: Settings, status: 'planned' },
-    ],
-  },
-];
-
-const pageTitles: Record<DashboardType, { title: string; subtitle: string }> = {
-  daily: {
-    title: 'Daily Analysis',
-    subtitle: 'Daily production output, zone supply, and collection monitoring.',
-  },
-  production: {
-    title: 'Production',
-    subtitle: 'Technical department production performance and source reporting.',
-  },
-  projects: {
-    title: 'Projects',
-    subtitle: 'Technical projects tracking module.',
-  },
-  sanitation: {
-    title: 'Sanitation',
-    subtitle: 'Sanitation operations module.',
-  },
-  waterDistribution: {
-    title: 'Water Distribution',
-    subtitle: 'Distribution department supply, NRW, and zone performance.',
-  },
-  salesCustCare: {
-    title: 'Sales & CustCare',
-    subtitle: 'Sales, customer care, billing-cycle and collection context.',
-  },
-  propoor: {
-    title: 'Propoor',
-    subtitle: 'Propoor programme monitoring module.',
-  },
-  revenue: {
-    title: 'Revenue',
-    subtitle: 'Finance department revenue and collection performance.',
-  },
-  billing: {
-    title: 'Billing',
-    subtitle: 'Billing module.',
-  },
-  accounts: {
-    title: 'Accounts',
-    subtitle: 'Accounts module.',
-  },
-  incidents: {
-    title: 'Incidents',
-    subtitle: 'Incident reporting, assignment, and resolution tracking.',
-  },
-  reports: {
-    title: 'Reports',
-    subtitle: 'Operational and management reporting.',
-  },
-  data: {
-    title: 'Data & Imports',
-    subtitle: 'Data entry, imports, and source records.',
-  },
-  waterBalance: {
-    title: 'Water Balancing',
-    subtitle: 'Production-to-zone source allocation and balance configuration.',
-  },
-  systemSettings: {
-    title: 'System Settings',
-    subtitle: 'System configuration and administration.',
-  },
-};
+import { ModuleErrorBoundary } from '@/components/layout/ModuleErrorBoundary';
+import { findModuleByPathname, moduleGroups } from '@/config/modules';
+import { useMyMeteringProfile } from '@/hooks/useMetering';
 
 export default function Index() {
-  const [activeDashboard, setActiveDashboard] = useState<DashboardType>('daily');
-  const currentPage = pageTitles[activeDashboard];
-
-  const activeItem = useMemo(
-    () => menuGroups.flatMap(group => group.items).find(item => item.id === activeDashboard),
-    [activeDashboard],
-  );
-
-  const renderContent = () => {
-    if (activeDashboard === 'daily') return <DailyAnalysis />;
-    if (activeDashboard === 'production') return <ProductionDashboard />;
-    if (activeDashboard === 'projects') return <ProjectsDashboard />;
-    if (activeDashboard === 'waterDistribution') return <DistributionDashboard />;
-    if (activeDashboard === 'salesCustCare') return <DistributionDashboard />;
-    if (activeDashboard === 'revenue') return <FinanceDashboard />;
-    if (activeDashboard === 'incidents') return <IncidentReporting />;
-    if (activeDashboard === 'reports') return <Reports />;
-    if (activeDashboard === 'data') return <DataEntry />;
-    if (activeDashboard === 'waterBalance') return <WaterBalanceSettings />;
-    return <PlannedModule title={currentPage.title} subtitle={currentPage.subtitle} />;
-  };
+  const { pathname } = useLocation();
+  const activeModule = findModuleByPathname(pathname);
 
   return (
     <SidebarProvider>
@@ -232,7 +48,7 @@ export default function Index() {
         </SidebarHeader>
 
         <SidebarContent>
-          <DashboardNavigation activeDashboard={activeDashboard} onSelectDashboard={setActiveDashboard} />
+          <DashboardNavigation />
         </SidebarContent>
 
         <SidebarSeparator />
@@ -244,40 +60,52 @@ export default function Index() {
         <SidebarRail />
       </Sidebar>
 
-      <SidebarInset>
+      {/* min-w-0 lets the content pane shrink below its content's intrinsic
+          width (wide tables) so inner overflow-x-auto wrappers scroll instead
+          of pushing the page under the fixed sidebar. */}
+      <SidebarInset className="min-w-0">
         <header className="sticky top-0 z-30 flex min-h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-6">
-          <SidebarTrigger className="shrink-0">
+          <SidebarTrigger className="shrink-0" aria-label="Toggle navigation">
             <Menu className="h-4 w-4" />
           </SidebarTrigger>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              {activeItem ? <activeItem.icon className="h-5 w-5 text-primary" /> : <BarChart3 className="h-5 w-5 text-primary" />}
-              <h1 className="truncate text-lg font-bold text-foreground">{currentPage.title}</h1>
+              {activeModule ? (
+                <activeModule.icon className="h-5 w-5 text-primary" />
+              ) : (
+                <BarChart3 className="h-5 w-5 text-primary" />
+              )}
+              <h1 className="truncate text-lg font-bold text-foreground">
+                {activeModule?.title ?? 'Dashboard'}
+              </h1>
             </div>
-            <p className="truncate text-xs text-muted-foreground md:text-sm">{currentPage.subtitle}</p>
+            <p className="truncate text-xs text-muted-foreground md:text-sm">
+              {activeModule?.subtitle ?? ''}
+            </p>
           </div>
+          <ThemeToggle />
         </header>
 
         <main className="min-w-0 flex-1 bg-gradient-surface">
-          {renderContent()}
+          <ModuleErrorBoundary key={pathname}>
+            <Suspense fallback={<ModuleLoading />}>
+              <Outlet />
+            </Suspense>
+          </ModuleErrorBoundary>
         </main>
       </SidebarInset>
     </SidebarProvider>
   );
 }
 
-function DashboardNavigation({
-  activeDashboard,
-  onSelectDashboard,
-}: {
-  activeDashboard: DashboardType;
-  onSelectDashboard: (dashboard: DashboardType) => void;
-}) {
+function DashboardNavigation() {
   const { isMobile, setOpenMobile } = useSidebar();
+  const { pathname } = useLocation();
+  const activeModule = findModuleByPathname(pathname);
+  const { data: profile } = useMyMeteringProfile();
+  const isSuperuser = Boolean(profile?.user.is_superuser);
 
-  const handleSelectDashboard = (dashboard: DashboardType) => {
-    onSelectDashboard(dashboard);
-
+  const handleNavigate = () => {
     if (isMobile) {
       setOpenMobile(false);
     }
@@ -285,52 +113,73 @@ function DashboardNavigation({
 
   return (
     <>
-      {menuGroups.map(group => (
-        <SidebarGroup key={group.label}>
-          <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {group.items.map(item => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton
-                    isActive={activeDashboard === item.id}
-                    tooltip={item.label}
-                    onClick={() => handleSelectDashboard(item.id)}
-                    className={cn(item.status === 'planned' && 'text-sidebar-foreground/70')}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                    {item.status === 'planned' ? (
-                      <span className="ml-auto rounded bg-sidebar-accent px-1.5 py-0.5 text-[10px] font-semibold text-sidebar-foreground/70">
-                        Later
-                      </span>
-                    ) : null}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      ))}
+      {moduleGroups.map(group => {
+        const visibleItems = group.items.filter(item => !item.requiresSuperuser || isSuperuser);
+
+        if (visibleItems.length === 0) {
+          return null;
+        }
+
+        return (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {visibleItems.map(item => (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={activeModule?.id === item.id}
+                      tooltip={item.label}
+                      className={cn(item.status === 'planned' && 'text-sidebar-foreground/70')}
+                    >
+                      <NavLink to={`/${item.path}`} onClick={handleNavigate}>
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.label}</span>
+                        {item.status === 'planned' ? (
+                          <span className="ml-auto rounded bg-sidebar-accent px-1.5 py-0.5 text-[10px] font-semibold text-sidebar-foreground/70">
+                            Later
+                          </span>
+                        ) : null}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        );
+      })}
     </>
   );
 }
 
-function PlannedModule({ title, subtitle }: { title: string; subtitle: string }) {
+function ThemeToggle() {
+  const { resolvedTheme, setTheme } = useTheme();
+  // next-themes only knows the real theme after hydration; render a stable
+  // icon until then to avoid a mismatch flash.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const isDark = mounted && resolvedTheme === 'dark';
+
   return (
-    <div className="container py-6">
-      <div className="rounded-lg border bg-card p-8 text-card-foreground shadow-sm">
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-muted">
-          <BookOpen className="h-6 w-6 text-muted-foreground" />
-        </div>
-        <h2 className="text-xl font-bold">{title}</h2>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{subtitle}</p>
-        <div className="mt-6">
-          <Button variant="secondary" disabled>
-            Module scheduled for later implementation
-          </Button>
-        </div>
-      </div>
+    <Button
+      variant="ghost"
+      size="icon"
+      className="shrink-0"
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+    >
+      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    </Button>
+  );
+}
+
+function ModuleLoading() {
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center">
+      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
     </div>
   );
 }

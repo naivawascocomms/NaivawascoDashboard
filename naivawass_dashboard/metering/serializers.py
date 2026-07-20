@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 from rest_framework import serializers
 
 from .access import user_can_submit_energy_meter_reading, user_can_submit_water_meter_reading
+from .constants import USER_ROLE_CHOICES
 from .models import (
     DistributionWaterMeterAssignment,
     EnergyMeter,
@@ -63,6 +65,130 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         ]
+
+
+class UserManagementSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+    profile = UserProfileSerializer(source='metering_profile', read_only=True)
+    password = serializers.CharField(write_only=True, required=False, allow_blank=False, trim_whitespace=False)
+    role = serializers.ChoiceField(choices=USER_ROLE_CHOICES, write_only=True, required=False)
+    phone_number = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    profile_notes = serializers.CharField(write_only=True, required=False, allow_blank=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'full_name',
+            'is_active',
+            'is_staff',
+            'is_superuser',
+            'last_login',
+            'date_joined',
+            'profile',
+            'password',
+            'role',
+            'phone_number',
+            'profile_notes',
+        ]
+        read_only_fields = ['id', 'full_name', 'last_login', 'date_joined', 'profile']
+        extra_kwargs = {
+            'email': {'required': False, 'allow_blank': True},
+            'first_name': {'required': False, 'allow_blank': True},
+            'last_name': {'required': False, 'allow_blank': True},
+            'is_active': {'required': False},
+            'is_staff': {'required': False},
+            'is_superuser': {'required': False},
+        }
+
+    def get_full_name(self, obj):
+        return obj.get_full_name() or obj.username
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        actor = getattr(request, 'user', None)
+        if not getattr(actor, 'is_superuser', False):
+            privileged_fields = {'is_staff', 'is_superuser'}
+            requested_privileges = privileged_fields.intersection(attrs)
+            if requested_privileges:
+                raise serializers.ValidationError(
+                    'Only superusers can change staff or superuser access.'
+                )
+
+        if self.instance is not None and self.instance == actor and attrs.get('is_active') is False:
+            raise serializers.ValidationError('You cannot deactivate your own user account.')
+
+        if self.instance is not None and self.instance == actor and attrs.get('is_superuser') is False:
+            raise serializers.ValidationError('You cannot remove your own superuser access.')
+
+        if self.instance is None and not attrs.get('password'):
+            raise serializers.ValidationError({'password': 'Password is required when creating a user.'})
+
+        return attrs
+
+    def _profile_payload(self, validated_data):
+        return {
+            'role': validated_data.pop('role', None),
+            'phone_number': validated_data.pop('phone_number', None),
+            'notes': validated_data.pop('profile_notes', None),
+        }
+
+    @transaction.atomic
+    def create(self, validated_data):
+        profile_payload = self._profile_payload(validated_data)
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+
+        profile, _ = UserProfile.objects.get_or_create(
+            user=user,
+            defaults={'role': profile_payload['role'] or 'PUMP_OPERATOR'},
+        )
+        profile.role = profile_payload['role'] or profile.role
+        profile.phone_number = profile_payload['phone_number'] or ''
+        profile.notes = profile_payload['notes'] or ''
+        profile.save(update_fields=['role', 'phone_number', 'notes', 'updated_at'])
+        user._state.fields_cache.pop('metering_profile', None)
+        return user
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        profile_payload = self._profile_payload(validated_data)
+        password = validated_data.pop('password', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if password:
+            instance.set_password(password)
+        instance.save()
+
+        profile, _ = UserProfile.objects.get_or_create(
+            user=instance,
+            defaults={'role': profile_payload['role'] or 'PUMP_OPERATOR'},
+        )
+        update_fields = []
+        if profile_payload['role'] is not None:
+            profile.role = profile_payload['role']
+            update_fields.append('role')
+        if profile_payload['phone_number'] is not None:
+            profile.phone_number = profile_payload['phone_number']
+            update_fields.append('phone_number')
+        if profile_payload['notes'] is not None:
+            profile.notes = profile_payload['notes']
+            update_fields.append('notes')
+        if update_fields:
+            profile.save(update_fields=[*update_fields, 'updated_at'])
+            instance._state.fields_cache.pop('metering_profile', None)
+        return instance
+
+
+class UserPasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True, allow_blank=False, trim_whitespace=False)
 
 
 class WaterMeterSerializer(serializers.ModelSerializer):

@@ -18,7 +18,7 @@ The final production stack should run:
 - PostgreSQL database container.
 - Django/Gunicorn backend container.
 - React frontend served by Nginx.
-- Optional mobile Supabase sync worker.
+- Mobile app access through the Django API.
 - Optional Cloudflare Tunnel container for HTTPS access without opening public inbound ports.
 - Scheduled database backups.
 - CI pipelines for backend, frontend, mobile, and deployment.
@@ -37,7 +37,7 @@ Local Ubuntu server
             |   +-- proxies /api, /admin, /static to backend
             +-- backend: Django + DRF + Gunicorn
             +-- db: PostgreSQL
-            +-- mobile-sync: optional Django management command worker
+            +-- mobile app: Django API client over /api
             +-- cloudflared: optional secure tunnel to Cloudflare
 ```
 
@@ -52,7 +52,7 @@ Deliverables:
 - Frontend port: `8080` for LAN fallback only.
 - Backend port: `8000`, exposed only if administrators need direct API access and you are not using the tunnel-only profile.
 - Staging frontend port: `8081` if staging runs on the same server.
-- Decide whether the mobile Supabase sync worker should run on the same server.
+- Confirm mobile clients point to the Django API exposed by the server.
 
 Recommended first milestone:
 
@@ -143,20 +143,10 @@ FRONTEND_PORT=8080
 BACKEND_PORT=8000
 ```
 
-If the mobile sync worker is enabled, also set:
-
-```env
-MOBILE_SUPABASE_DATABASE_URL=<mobile-supabase-pooler-url>
-MOBILE_SUPABASE_URL=<mobile-supabase-url>
-MOBILE_SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
-MOBILE_SUPABASE_DEFAULT_PASSWORD=<temporary-password-if-creating-users>
-MOBILE_SYNC_INTERVAL=10
-```
-
 Rules:
 
 - Never commit `.env`.
-- Never put Supabase service-role keys in the Android app.
+- Never put backend database credentials or server secrets in the Android app.
 - Keep `DJANGO_DEBUG=False` for any shared server.
 - Use Cloudflare HTTPS origins in CORS when moving from LAN to Cloudflare.
 
@@ -169,7 +159,6 @@ Current container inventory:
 | `db` | `postgres:18-alpine` | PostgreSQL data store | internal |
 | `backend` | `naivawass_dashboard/Dockerfile` | Django, migrations, static collection, Gunicorn | `8000` |
 | `frontend` | `production-pulse/Dockerfile` | Vite build served by Nginx, proxies API/admin/static | `8080 -> 80` |
-| `mobile-sync` | `naivawass_dashboard/Dockerfile` | Optional Supabase pull loop | none |
 
 The root Compose file uses the internal Docker Postgres service `db` and sets `DATABASE_URL` with `sslmode=disable` for that local container network path.
 
@@ -185,7 +174,6 @@ Check services:
 docker compose ps
 docker compose logs -f backend
 docker compose logs -f frontend
-docker compose logs -f mobile-sync
 ```
 
 Run Django verification:
@@ -220,7 +208,7 @@ Restore into the Docker database:
 
 ```powershell
 docker compose exec db pg_restore -U postgres -d naivawasco_local --clean --if-exists /backups/naivawasco_local.dump
-docker compose restart backend mobile-sync
+docker compose restart backend
 ```
 
 Validation after restore:
@@ -357,7 +345,7 @@ Mobile app environment rules:
 
 - Staging build points to the staging API hostname.
 - Production build points to the production API hostname.
-- No database URLs or service-role keys in Expo public config.
+- No database URLs or server secrets in Expo public config.
 
 ### Infra CI
 
@@ -495,7 +483,6 @@ Minimum daily checks:
 docker compose -p naivawasco-prod ps
 docker compose -p naivawasco-prod logs --tail=100 backend
 docker compose -p naivawasco-prod logs --tail=100 frontend
-docker compose -p naivawasco-prod logs --tail=100 mobile-sync
 df -h
 ```
 
@@ -514,7 +501,7 @@ Operational response targets:
 | Frontend down | Check `frontend` container and Nginx logs |
 | Login/API failing | Check `backend` logs and `python manage.py check` |
 | Database errors | Check `db` health and disk space |
-| Mobile readings missing | Check `mobile-sync` logs and Supabase credentials |
+| Mobile readings missing | Check mobile API URL, backend logs, assignments, and user profile |
 | Cloudflare URL down | Check `cloudflared` logs and tunnel status |
 
 ## Phase 12: Go-Live Checklist
@@ -577,4 +564,4 @@ And operations can prove:
 - A database backup can be restored.
 - A failed release can be rolled back to previous image tags.
 - Secrets are not stored in Git.
-- The Android app never contains backend database or Supabase service-role credentials.
+- The Android app never contains backend database credentials or server secrets.

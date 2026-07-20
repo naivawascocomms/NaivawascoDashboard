@@ -8,6 +8,7 @@ from .views import (
     MeterReadingAssignmentViewSet,
     ProductionEnergyMeterAssignmentViewSet,
     ProductionWaterMeterAssignmentViewSet,
+    UserManagementViewSet,
     UserProfileViewSet,
     WaterMeterReadingViewSet,
     WaterMeterViewSet,
@@ -18,6 +19,7 @@ app_name = 'metering'
 router = DefaultRouter()
 router.register(r'water-meters', WaterMeterViewSet, basename='watermeter')
 router.register(r'energy-meters', EnergyMeterViewSet, basename='energymeter')
+router.register(r'users', UserManagementViewSet, basename='meteringuser')
 router.register(r'user-profiles', UserProfileViewSet, basename='userprofile')
 router.register(r'water-meter-readings', WaterMeterReadingViewSet, basename='watermeterreading')
 router.register(r'energy-meter-readings', EnergyMeterReadingViewSet, basename='energymeterreading')

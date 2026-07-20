@@ -10,7 +10,7 @@ NAIVAWASCO is a water utility management system for monitoring production, distr
 - `production-pulse/` - React/TypeScript web frontend
 - `meter-reading-mobile/` - Expo React Native Android app for field meter readings and incidents
 
-The web system uses Django as the source of truth for operational dashboards. The mobile app writes to a separate Supabase project and is synchronized with Django by backend management commands.
+The web system and mobile app use Django/PostgreSQL as the source of truth. The mobile app signs in with Django JWT auth and calls the backend API directly.
 
 ## Development Commands
 
@@ -64,14 +64,13 @@ npm run web        # Expo web
 npm run typecheck  # TypeScript check
 ```
 
-The mobile app uses Expo SDK 54, React 19, React Native 0.81, Supabase JS, AsyncStorage, SecureStore, and Expo Location. Configure:
+The mobile app uses Expo SDK 54, React 19, React Native 0.81, AsyncStorage, SecureStore, and Expo Location. Configure:
 
 ```env
-EXPO_PUBLIC_SUPABASE_URL=https://your-mobile-project-ref.supabase.co
-EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-mobile-project-publishable-key
+EXPO_PUBLIC_API_BASE_URL=http://<backend-host>:8000/api
 ```
 
-The service-role key and Supabase database URL belong only in the Django backend environment, never in the Android app.
+The Android app must never contain backend database credentials or server secrets.
 
 ### Docker
 
@@ -82,12 +81,11 @@ Copy-Item .env.docker.example .env
 docker compose up -d --build
 ```
 
-Docker runs PostgreSQL, Django/Gunicorn, the React frontend through Nginx, and an optional `mobile-sync` worker. Useful commands:
+Docker runs PostgreSQL, Django/Gunicorn, and the React frontend through Nginx. Useful commands:
 
 ```powershell
 docker compose logs -f backend
 docker compose logs -f frontend
-docker compose logs -f mobile-sync
 docker compose exec backend python manage.py migrate
 docker compose exec backend python manage.py createsuperuser
 docker compose down
@@ -120,10 +118,6 @@ Settings load `naivawass_dashboard/.env` manually. Important environment variabl
 - `DJANGO_DEBUG`
 - `DJANGO_ALLOWED_HOSTS`
 - `DJANGO_CORS_ALLOWED_ORIGINS`
-- `MOBILE_SUPABASE_DATABASE_URL`
-- `MOBILE_SUPABASE_URL`
-- `MOBILE_SUPABASE_SERVICE_ROLE_KEY`
-- `MOBILE_SUPABASE_DEFAULT_PASSWORD`
 
 The backend timezone is `Africa/Nairobi`. Static files use WhiteNoise compressed manifest storage.
 
@@ -318,16 +312,12 @@ python manage.py import_distribution_dashboard_historical
 python manage.py import_sales_cc_dashboard
 ```
 
-Metering and mobile sync:
+Metering:
 
 ```bash
 python manage.py import_water_meter_list
 python manage.py refresh_meter_display_names
 python manage.py seed_shared_meter_history
-python manage.py sync_mobile_supabase --push-reference-data
-python manage.py sync_mobile_supabase --pull-submissions
-python manage.py sync_mobile_supabase --pull-submissions --loop --interval 10
-python manage.py sync_mobile_supabase --push-reference-data --create-missing-auth-users --default-mobile-password "<temporary-password>"
 ```
 
 Finance:
@@ -335,14 +325,6 @@ Finance:
 ```bash
 python manage.py import_finance_dashboard
 ```
-
-Apply the mobile Supabase schema from the backend:
-
-```powershell
-powershell.exe -ExecutionPolicy Bypass -File .\scripts\apply_mobile_supabase_schema.ps1 -DatabaseUrl "<mobile-supabase-pooler-url>"
-```
-
-On IPv4-only networks, use Supabase's connection pooler URL rather than the direct `db.<project-ref>.supabase.co` URL.
 
 ## Frontend Architecture
 
@@ -400,32 +382,32 @@ Live dashboards commonly refetch every 60 seconds, including production dashboar
 
 ## Mobile App Architecture
 
-`meter-reading-mobile/` is an Expo app for Android field workflows. It authenticates directly with the separate mobile Supabase project and does not call the Django API.
+`meter-reading-mobile/` is an Expo app for Android field workflows. It authenticates with Django JWT and calls the Django API directly.
 
 Key structure:
 
 - `App.tsx` - wraps the app in `AuthProvider` and switches between login and the main app
-- `src/auth/AuthProvider.tsx` - Supabase auth state
-- `src/supabase/client.ts` - Supabase client and settings resolution
-- `src/api/` - Supabase data access for auth, readings, and incidents
+- `src/auth/AuthProvider.tsx` - Django JWT auth state
+- `src/api/client.ts` - shared backend API client and token refresh handling
+- `src/api/authApi.ts`, `meteringApi.ts`, `incidentsApi.ts` - backend data access for auth, readings, and incidents
 - `src/features/readings/` - login, task list, reading form, pending sync, settings, and incidents screens
 - `src/storage/pendingReadings.ts` - AsyncStorage retry queue for failed submissions
-- `src/storage/supabaseSettings.ts` - locally editable Supabase URL/key settings
+- `src/storage/pendingIncidentActions.ts` - AsyncStorage retry queue for failed incident actions
 - `src/types/` - mobile metering and incident types
 
 Mobile workflow:
 
-- Field staff sign in with Supabase Auth email/password.
+- Field staff sign in with Django username/password.
 - The app loads assigned water/energy meter-reading tasks for the current day.
-- Submissions go directly to Supabase with RLS protection.
+- Submissions go directly to Django API endpoints.
 - Failed submissions are queued locally and retried from the Sync tab.
-- Assigned incidents can be viewed and updated directly in Supabase.
-- Django pushes reference data and pulls submitted readings/incidents through `sync_mobile_supabase`.
+- Assigned incidents can be viewed and updated through the backend API.
+- Failed incident reports, comments, status changes, and assignment updates are queued locally and retried from the Sync tab.
 
 ## Cross-App Data Flow
 
 - Django is the operational reporting backend for the web dashboards.
-- The mobile Supabase project is a field capture store, not the primary web dashboard database.
+- Django/PostgreSQL is the shared backend for web dashboards and mobile field capture.
 - `metering` owns canonical shared physical meters and reading assignments.
 - Production and distribution dashboards consume shared metering data through sync/import logic and model rollups.
 - Water-balance source attribution is explanatory/reporting configuration layered on top of production and distribution data.

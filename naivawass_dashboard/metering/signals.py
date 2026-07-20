@@ -13,13 +13,6 @@ from .models import (
     WaterMeter,
     WaterMeterReading,
 )
-from .mobile_supabase import (
-    push_assignment,
-    push_meter,
-    push_profile,
-    push_reading_status,
-    remove_assignment,
-)
 from .sync import refresh_energy_meter_display_name, refresh_water_meter_display_name
 
 
@@ -122,13 +115,6 @@ def ensure_user_profile(sender, instance, created, **kwargs):
     UserProfile.objects.get_or_create(user=instance, defaults={'role': default_role})
 
 
-@receiver(post_save, sender=UserProfile)
-def sync_mobile_profile(sender, instance, **kwargs):
-    if _raw_save(kwargs):
-        return
-    push_profile(instance)
-
-
 @receiver(pre_save, sender=ProductionWaterMeterAssignment)
 def cache_previous_production_water_assignment(sender, instance, **kwargs):
     if _raw_save(kwargs):
@@ -193,35 +179,6 @@ def refresh_related_meter_labels_for_reading_assignment(sender, instance, **kwar
         refresh_energy_meter_display_name(instance.energy_meter)
 
 
-@receiver(post_save, sender=MeterReadingAssignment)
-def sync_mobile_reading_assignment(sender, instance, **kwargs):
-    if _raw_save(kwargs):
-        return
-    push_assignment(instance)
-
-
-@receiver(post_delete, sender=MeterReadingAssignment)
-def sync_mobile_reading_assignment_delete(sender, instance, **kwargs):
-    if _raw_save(kwargs):
-        return
-    if instance.pk:
-        remove_assignment(instance.pk)
-
-
-@receiver(post_save, sender=WaterMeter)
-def sync_mobile_water_meter(sender, instance, **kwargs):
-    if _raw_save(kwargs):
-        return
-    push_meter(instance)
-
-
-@receiver(post_save, sender=EnergyMeter)
-def sync_mobile_energy_meter(sender, instance, **kwargs):
-    if _raw_save(kwargs):
-        return
-    push_meter(instance)
-
-
 @receiver(post_save, sender=ProductionEnergyMeterAssignment)
 @receiver(post_delete, sender=ProductionEnergyMeterAssignment)
 def refresh_production_energy_meter_label(sender, instance, **kwargs):
@@ -257,13 +214,6 @@ def refresh_derived_records_after_water_meter_reading_change(sender, instance, *
         _refresh_distribution(meter_number_dates=[(meter_number, instance.reading_date)])
 
 
-@receiver(post_save, sender=WaterMeterReading)
-def sync_mobile_water_reading_status(sender, instance, **kwargs):
-    if _raw_save(kwargs):
-        return
-    push_reading_status(instance, 'WATER')
-
-
 @receiver(post_save, sender=EnergyMeterReading)
 @receiver(post_delete, sender=EnergyMeterReading)
 def refresh_derived_records_after_energy_meter_reading_change(sender, instance, **kwargs):
@@ -280,10 +230,3 @@ def refresh_derived_records_after_energy_meter_reading_change(sender, instance, 
         for site_id in site_ids
         if site_id
     })
-
-
-@receiver(post_save, sender=EnergyMeterReading)
-def sync_mobile_energy_reading_status(sender, instance, **kwargs):
-    if _raw_save(kwargs):
-        return
-    push_reading_status(instance, 'ENERGY')

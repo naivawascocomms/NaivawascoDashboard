@@ -1,7 +1,8 @@
-import { Header } from '@/components/dashboard/Header';
 import { BillingBreakdownCard } from '@/components/finance/BillingBreakdownCard';
 import { CollectionTrendChart } from '@/components/finance/CollectionTrendChart';
-import { FinanceKPICard } from '@/components/finance/FinanceKPICard';
+import { KpiCard } from '@/components/kpi/KpiCard';
+import { PageToolbar } from '@/components/layout/PageToolbar';
+import { ErrorState, LoadingState } from '@/components/layout/QueryState';
 import { RegionalFinanceCard } from '@/components/finance/RegionalFinanceCard';
 import { PeriodFilter } from '@/components/filters/PeriodFilter';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,6 +11,7 @@ import { useFinanceDashboard, useFinanceReports } from '@/hooks/useFinance';
 import type { FinanceDashboardRow, FinanceKPI } from '@/types/finance';
 import { AlertCircle, Coins, Loader2, MapPin, Receipt, TrendingUp, Wallet } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { formatCompact } from '@/lib/format';
 
 const MONTH_NAMES = [
   'January',
@@ -40,12 +42,6 @@ const FISCAL_MONTHS = [
   { value: 5, label: 'May' },
   { value: 6, label: 'June' },
 ];
-
-function formatCompact(value: number) {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
-  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
-  return value.toLocaleString();
-}
 
 function formatMetricValue(row: FinanceDashboardRow, value: number | null) {
   if (value === null || value === undefined) return '-';
@@ -131,10 +127,7 @@ export default function FinanceDashboard() {
     return (
       <div className="min-h-screen bg-gradient-surface">
         <div className="container py-6 md:py-8">
-          <Header currentPeriod={currentPeriod} onRefresh={() => refetch()} />
-          <div className="flex min-h-[320px] items-center justify-center rounded-xl border border-border/50 bg-card">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          </div>
+          <LoadingState label="Loading finance dashboard…" />
         </div>
       </div>
     );
@@ -144,14 +137,11 @@ export default function FinanceDashboard() {
     return (
       <div className="min-h-screen bg-gradient-surface">
         <div className="container py-6 md:py-8">
-          <Header currentPeriod={currentPeriod} onRefresh={() => refetch()} />
-          <div className="flex min-h-[320px] flex-col items-center justify-center gap-3 rounded-xl border border-destructive/30 bg-destructive/5 text-center">
-            <AlertCircle className="h-8 w-8 text-destructive" />
-            <div>
-              <p className="font-semibold text-foreground">Finance dashboard data is not available.</p>
-              <p className="text-sm text-muted-foreground">Check that the finance workbook has been imported.</p>
-            </div>
-          </div>
+          <ErrorState
+            title="Finance dashboard data is not available."
+            message="Check that the finance workbook has been imported."
+            onRetry={() => refetch()}
+          />
         </div>
       </div>
     );
@@ -167,35 +157,30 @@ export default function FinanceDashboard() {
   return (
     <div className="min-h-screen bg-gradient-surface">
       <div className="container py-6 md:py-8">
-        <Header currentPeriod={currentPeriod} onRefresh={() => refetch()} />
-
         <Tabs
           value={activeSection}
           onValueChange={(value) => setActiveSection(value as 'revenue' | 'billing' | 'accounts')}
           className="space-y-6"
         >
-          <div className="rounded-2xl border border-border/50 bg-card/70 p-4 shadow-soft">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <h2 className="text-xl font-semibold text-foreground">Finance</h2>
-              <TabsList className="h-auto flex-wrap gap-1 p-1">
-                <TabsTrigger value="revenue" className="flex items-center gap-1.5">
-                  <TrendingUp className="h-3.5 w-3.5" />
-                  Revenue
-                </TabsTrigger>
-                <TabsTrigger value="billing" className="flex items-center gap-1.5">
-                  <Receipt className="h-3.5 w-3.5" />
-                  Billing
-                </TabsTrigger>
-                <TabsTrigger value="accounts" className="flex items-center gap-1.5">
-                  <Wallet className="h-3.5 w-3.5" />
-                  Accounts
-                </TabsTrigger>
-              </TabsList>
-            </div>
+          <div className="rounded-2xl border border-border/50 bg-card/70 p-2 shadow-soft">
+            <TabsList className="h-auto flex-wrap gap-1 p-1">
+              <TabsTrigger value="revenue" className="flex items-center gap-1.5">
+                <TrendingUp className="h-3.5 w-3.5" />
+                Revenue
+              </TabsTrigger>
+              <TabsTrigger value="billing" className="flex items-center gap-1.5">
+                <Receipt className="h-3.5 w-3.5" />
+                Billing
+              </TabsTrigger>
+              <TabsTrigger value="accounts" className="flex items-center gap-1.5">
+                <Wallet className="h-3.5 w-3.5" />
+                Accounts
+              </TabsTrigger>
+            </TabsList>
           </div>
 
           <TabsContent value="revenue" className="space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/50 bg-card p-4">
+          <PageToolbar periodLabel={currentPeriod} onRefresh={() => refetch()}>
             <PeriodFilter
               selectedMonth={monthValue}
               selectedYear={fyYearValue}
@@ -209,12 +194,12 @@ export default function FinanceDashboard() {
               onRegionChange={setSelectedRegion}
               regions={dashboardData.regional.map((region) => region.region)}
             />
-          </div>
+          </PageToolbar>
 
-          <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 animate-fade-in">
+          <div className="rounded-xl border border-success/20 bg-success/10 p-4 animate-fade-in">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <Wallet className="w-6 h-6 text-emerald-500" />
+                <Wallet className="w-6 h-6 text-success" />
                 <div>
                   <p className="text-sm text-muted-foreground">Current Year Financial Summary</p>
                   <p className="text-2xl font-bold mono-value">
@@ -252,7 +237,7 @@ export default function FinanceDashboard() {
             </h2>
             <div className="data-grid">
               {financeKPIs.map((kpi, idx) => (
-                <FinanceKPICard key={kpi.label} {...kpi} delay={idx * 75} />
+                <KpiCard key={kpi.label} {...kpi} delay={idx * 75} />
               ))}
             </div>
           </section>
@@ -263,7 +248,7 @@ export default function FinanceDashboard() {
             </h2>
             <div className="data-grid">
               {cumulativeFinanceKPIs.map((kpi, idx) => (
-                <FinanceKPICard key={kpi.label} {...kpi} delay={idx * 60} />
+                <KpiCard key={kpi.label} {...kpi} delay={idx * 60} />
               ))}
             </div>
           </section>

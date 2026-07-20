@@ -5,7 +5,7 @@ This setup runs the NAIVAWASCO web system inside the organization network. For p
 - PostgreSQL database container
 - Django backend container
 - React frontend served by Nginx
-- Optional mobile Supabase sync worker
+- Expo mobile app access through the Django API
 
 For the canonical "clone this repo to a fresh server and deploy it" runbook, start with `docs/server_clone_and_deploy.md`.
 
@@ -25,7 +25,6 @@ Edit `.env` and set:
 - `DJANGO_SECRET_KEY`
 - `DJANGO_ALLOWED_HOSTS`
 - `DJANGO_CORS_ALLOWED_ORIGINS`
-- `MOBILE_SUPABASE_DATABASE_URL` if the Android app sync worker should run
 
 Use the production server LAN IP in the host/origin values for LAN fallback only, for example:
 
@@ -79,7 +78,7 @@ docker compose exec db pg_restore -U postgres -d naivawasco_local --clean --if-e
 After restoring, restart the backend:
 
 ```powershell
-docker compose restart backend mobile-sync
+docker compose restart backend
 ```
 
 ## 4. Useful Commands
@@ -89,7 +88,6 @@ View logs:
 ```powershell
 docker compose logs -f backend
 docker compose logs -f frontend
-docker compose logs -f mobile-sync
 ```
 
 Run Django commands:

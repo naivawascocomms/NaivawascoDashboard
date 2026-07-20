@@ -3,6 +3,8 @@ import type {
   EnergyMeterReading,
   MeterReadingApprovalResponse,
   MeterReadingAssignment,
+  ManagedUser,
+  ManagedUserPayload,
   PaginatedResponse,
   DistributionWaterMeterAssignment,
   ProductionEnergyMeterAssignment,
@@ -33,9 +35,38 @@ export type PendingApprovalParams = {
   zone?: number;
 };
 
+export type ManagedUserParams = {
+  is_active?: boolean;
+  is_staff?: boolean;
+  is_superuser?: boolean;
+  metering_profile__role?: string;
+  search?: string;
+  ordering?: string;
+  page?: number;
+  page_size?: number;
+};
+
 export const meteringService = {
   getMyProfile: () =>
     api.get<UserProfile>('/metering/user-profiles/me/'),
+
+  getManagedUsers: (params?: ManagedUserParams) =>
+    api.get<PaginatedResponse<ManagedUser>>('/metering/users/', params),
+
+  getCurrentManagedUser: () =>
+    api.get<ManagedUser>('/metering/users/me/'),
+
+  createManagedUser: (payload: ManagedUserPayload) =>
+    api.post<ManagedUser>('/metering/users/', payload),
+
+  updateManagedUser: ({ id, ...payload }: Partial<ManagedUserPayload> & { id: number }) =>
+    api.patch<ManagedUser>(`/metering/users/${id}/`, payload),
+
+  deactivateManagedUser: (id: number) =>
+    api.delete<ManagedUser>(`/metering/users/${id}/`),
+
+  setManagedUserPassword: ({ id, password }: { id: number; password: string }) =>
+    api.post<{ detail: string }>(`/metering/users/${id}/set_password/`, { password }),
 
   getWaterMeters: (params?: {
     is_active?: boolean;

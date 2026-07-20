@@ -204,6 +204,37 @@ export interface UserProfile {
   updated_at: string;
 }
 
+export type MeteringUserRole = 'PRODUCTION_SUPERVISOR' | 'PUMP_OPERATOR' | 'ZONAL_OFFICER' | 'PLUMBER';
+
+export interface ManagedUser {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  is_active: boolean;
+  is_staff: boolean;
+  is_superuser: boolean;
+  last_login: string | null;
+  date_joined: string;
+  profile: UserProfile | null;
+}
+
+export interface ManagedUserPayload {
+  username: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  is_active?: boolean;
+  is_staff?: boolean;
+  is_superuser?: boolean;
+  password?: string;
+  role?: MeteringUserRole;
+  phone_number?: string;
+  profile_notes?: string;
+}
+
 export interface MeterReadingAssignment {
   id: number;
   assignee: UserSummary;

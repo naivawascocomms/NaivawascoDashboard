@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, AppState, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, AppState, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { ApiError } from '../../api/errors';
 import { getAssignedIncidents, performPendingIncidentAction } from '../../api/incidentsApi';
@@ -19,8 +19,10 @@ import { ReadingForm } from './ReadingForm';
 import { SettingsScreen } from './SettingsScreen';
 import { TaskCard } from './TaskCard';
 
-type HomeTab = 'pendingTasks' | 'submittedTasks' | 'approvedReadings' | 'incidents';
-type MainTab = 'home' | 'sync' | 'settings';
+type MainScreen = 'home' | 'meterReading' | 'incidents' | 'sync' | 'settings';
+type ReadingTab = 'pending' | 'submitted' | 'approved' | 'all';
+type MeterTypeFilter = 'ALL' | 'WATER' | 'ENERGY';
+type ScopeFilter = 'ALL' | 'PRODUCTION_SITE' | 'ZONE';
 
 function errorMessage(error: unknown) {
   if (error instanceof ApiError) {
@@ -38,8 +40,12 @@ function isRetryableSyncError(error: unknown) {
 
 export function MeterReadingApp() {
   const { profile } = useAuth();
-  const [mainTab, setMainTab] = useState<MainTab>('home');
-  const [homeTab, setHomeTab] = useState<HomeTab>('pendingTasks');
+  const [mainScreen, setMainScreen] = useState<MainScreen>('home');
+  const [readingTab, setReadingTab] = useState<ReadingTab>('pending');
+  const [meterTypeFilter, setMeterTypeFilter] = useState<MeterTypeFilter>('ALL');
+  const [scopeFilter, setScopeFilter] = useState<ScopeFilter>('ALL');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [routeView, setRouteView] = useState(false);
   const [selectedTask, setSelectedTask] = useState<ReadingTask | null>(null);
   const [tasks, setTasks] = useState<ReadingTask[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
@@ -48,18 +54,53 @@ export function MeterReadingApp() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const isSyncingRef = useRef(false);
-  const readingDate = todayIso();
+  const [readingDate, setReadingDate] = useState(todayIso());
 
   const pendingTasks = useMemo(() => tasks.filter(task => task.status === 'missing'), [tasks]);
   const submittedTasks = useMemo(() => tasks.filter(task => task.status === 'submitted'), [tasks]);
   const approvedReadings = useMemo(() => tasks.filter(task => task.status === 'validated'), [tasks]);
-  const activeHomeTasks = homeTab === 'pendingTasks'
-    ? pendingTasks
-    : homeTab === 'submittedTasks'
-      ? submittedTasks
-      : homeTab === 'approvedReadings'
-        ? approvedReadings
-        : [];
+  const pendingSyncCount = pendingReadings.length + pendingIncidentActions.length;
+  const submittedAndApprovedCount = submittedTasks.length + approvedReadings.length;
+
+  const activeReadingTasks = useMemo(() => {
+    const tabbedTasks = readingTab === 'pending'
+      ? pendingTasks
+      : readingTab === 'submitted'
+        ? submittedTasks
+        : readingTab === 'approved'
+          ? approvedReadings
+          : tasks;
+
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const filtered = tabbedTasks.filter(task => {
+      const matchesType = meterTypeFilter === 'ALL' || task.meter_type === meterTypeFilter;
+      const matchesScope = scopeFilter === 'ALL' || task.scopes.some(scope => scope.scope_type === scopeFilter);
+      const searchableText = [
+        task.meter_number,
+        task.meter_label,
+        task.display_name,
+        ...task.scopes.map(scope => scope.production_site_name || scope.zone_name || ''),
+      ].join(' ').toLowerCase();
+      return matchesType && matchesScope && (!normalizedSearch || searchableText.includes(normalizedSearch));
+    });
+
+    if (!routeView) return filtered;
+    return [...filtered].sort((a, b) => {
+      const aScope = a.scopes.map(scope => scope.production_site_name || scope.zone_name || '').join(' ');
+      const bScope = b.scopes.map(scope => scope.production_site_name || scope.zone_name || '').join(' ');
+      return `${aScope} ${a.meter_label}`.localeCompare(`${bScope} ${b.meter_label}`);
+    });
+  }, [
+    approvedReadings,
+    meterTypeFilter,
+    pendingTasks,
+    readingTab,
+    routeView,
+    scopeFilter,
+    searchTerm,
+    submittedTasks,
+    tasks,
+  ]);
 
   const loadPending = useCallback(async () => {
     const [nextReadings, nextIncidentActions] = await Promise.all([
@@ -251,7 +292,58 @@ export function MeterReadingApp() {
     return <ReadingForm task={selectedTask} onCancel={() => setSelectedTask(null)} onSubmit={handleSubmit} />;
   }
 
-  if (mainTab === 'sync') {
+  if (mainScreen === 'meterReading') {
+    return (
+      <View style={styles.appShell}>
+        <View style={styles.mainPane}>
+          <MeterReadingModule
+            activeTab={readingTab}
+            approvedCount={approvedReadings.length}
+            filteredTasks={activeReadingTasks}
+            isLoading={isLoading}
+            meterTypeFilter={meterTypeFilter}
+            onBack={() => setMainScreen('home')}
+            onDateChange={setReadingDate}
+            onFilterChange={setMeterTypeFilter}
+            onRefresh={refresh}
+            onScopeFilterChange={setScopeFilter}
+            onSearchChange={setSearchTerm}
+            onSelectTask={setSelectedTask}
+            onTabChange={setReadingTab}
+            onToggleRouteView={() => setRouteView(value => !value)}
+            pendingCount={pendingTasks.length}
+            readingDate={readingDate}
+            routeView={routeView}
+            scopeFilter={scopeFilter}
+            searchTerm={searchTerm}
+            submittedCount={submittedTasks.length}
+            totalCount={tasks.length}
+          />
+        </View>
+        <BottomNav activeScreen={mainScreen} pendingCount={pendingSyncCount} onChange={setMainScreen} />
+      </View>
+    );
+  }
+
+  if (mainScreen === 'incidents') {
+    return (
+      <View style={styles.appShell}>
+        <View style={styles.mainPane}>
+          <Screen scroll={false}>
+            <ModuleHeader
+              title="Incident Management"
+              subtitle={`${incidents.length} assigned active incident${incidents.length === 1 ? '' : 's'}`}
+              onBack={() => setMainScreen('home')}
+            />
+            <IncidentsScreen incidents={incidents} isLoading={isLoading} onRefresh={refresh} onPendingChange={loadPending} />
+          </Screen>
+        </View>
+        <BottomNav activeScreen={mainScreen} pendingCount={pendingSyncCount} onChange={setMainScreen} />
+      </View>
+    );
+  }
+
+  if (mainScreen === 'sync') {
     return (
       <View style={styles.appShell}>
         <View style={styles.mainPane}>
@@ -262,18 +354,18 @@ export function MeterReadingApp() {
             onSync={() => void syncPending()}
           />
         </View>
-        <BottomNav activeTab={mainTab} pendingCount={pendingReadings.length + pendingIncidentActions.length} onChange={setMainTab} />
+        <BottomNav activeScreen={mainScreen} pendingCount={pendingSyncCount} onChange={setMainScreen} />
       </View>
     );
   }
 
-  if (mainTab === 'settings') {
+  if (mainScreen === 'settings') {
     return (
       <View style={styles.appShell}>
         <View style={styles.mainPane}>
           <SettingsScreen />
         </View>
-        <BottomNav activeTab={mainTab} pendingCount={pendingReadings.length + pendingIncidentActions.length} onChange={setMainTab} />
+        <BottomNav activeScreen={mainScreen} pendingCount={pendingSyncCount} onChange={setMainScreen} />
       </View>
     );
   }
@@ -281,96 +373,277 @@ export function MeterReadingApp() {
   return (
     <View style={styles.appShell}>
       <View style={styles.mainPane}>
-        <Screen scroll={false}>
+        <Screen>
           <View style={styles.header}>
             <View>
               <Text style={styles.greeting}>Hello, {profile?.user.first_name || profile?.user.username}</Text>
-              <Text style={styles.title}>Field Dashboard</Text>
+              <Text style={styles.title}>Field Home</Text>
               <Text style={styles.subtitle}>{formatFriendlyDate(readingDate)}</Text>
             </View>
             <View style={styles.countBox}>
-              <Text style={styles.count}>{pendingTasks.length}</Text>
-              <Text style={styles.countLabel}>pending</Text>
+              <Text style={styles.count}>{pendingSyncCount}</Text>
+              <Text style={styles.countLabel}>unsynced</Text>
             </View>
           </View>
 
-          <View style={styles.summaryRow}>
-            <SummaryPill label="Pending" value={pendingTasks.length} />
-            <SummaryPill label="Submitted" value={submittedTasks.length} />
-            <SummaryPill label="Approved" value={approvedReadings.length} />
+          <View style={styles.summaryGrid}>
+            <SummaryPill label="Pending readings" value={pendingTasks.length} tone={colors.warning} />
+            <SummaryPill label="Assigned incidents" value={incidents.length} tone={colors.danger} />
+            <SummaryPill label="Unsynced items" value={pendingSyncCount} tone={colors.info} />
+            <SummaryPill label="Submitted/approved" value={submittedAndApprovedCount} tone={colors.success} />
           </View>
 
-          <HomeTabs activeTab={homeTab} onChange={setHomeTab} counts={{
-            pendingTasks: pendingTasks.length,
-            submittedTasks: submittedTasks.length,
-            approvedReadings: approvedReadings.length,
-            incidents: incidents.length,
-          }} />
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Modules</Text>
+            {isLoading ? <ActivityIndicator color={colors.primary} size="small" /> : null}
+          </View>
 
-          {isLoading ? (
-            <View style={styles.loading}>
-              <ActivityIndicator color={colors.primary} size="large" />
-            </View>
-          ) : homeTab === 'incidents' ? (
-            <IncidentsScreen incidents={incidents} isLoading={isLoading} onRefresh={refresh} onPendingChange={loadPending} />
-          ) : (
-            <ScrollView
-              contentContainerStyle={styles.list}
-              refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} />}
-            >
-              {activeHomeTasks.length === 0 ? (
-                <View style={styles.empty}>
-                  <Text style={styles.emptyTitle}>{emptyTitle(homeTab)}</Text>
-                  <Text style={styles.emptyText}>{emptyMessage(homeTab)}</Text>
-                  <AppButton label="Refresh" onPress={refresh} variant="secondary" style={styles.refreshButton} />
-                </View>
-              ) : activeHomeTasks.map(task => (
-                <TaskCard key={`${task.meter_type}-${task.meter_id}`} task={task} onPress={() => setSelectedTask(task)} />
-              ))}
-            </ScrollView>
-          )}
+          <View style={styles.menuGrid}>
+            <MenuTile
+              title="Meter Reading"
+              detail={`${pendingTasks.length} pending, ${submittedAndApprovedCount} completed`}
+              count={tasks.length}
+              tone={colors.primary}
+              onPress={() => setMainScreen('meterReading')}
+            />
+            <MenuTile
+              title="Incident Management"
+              detail={`${incidents.length} assigned active`}
+              count={incidents.length}
+              tone={colors.danger}
+              onPress={() => setMainScreen('incidents')}
+            />
+            <MenuTile
+              title="Sync Center"
+              detail={pendingSyncCount ? `${pendingSyncCount} item(s) need upload` : 'All local items uploaded'}
+              count={pendingSyncCount}
+              tone={colors.info}
+              onPress={() => setMainScreen('sync')}
+            />
+            <MenuTile
+              title="Settings"
+              detail={profile?.role_display || profile?.role || 'User profile'}
+              tone={colors.muted}
+              onPress={() => setMainScreen('settings')}
+            />
+          </View>
         </Screen>
       </View>
-      <BottomNav activeTab={mainTab} pendingCount={pendingReadings.length + pendingIncidentActions.length} onChange={setMainTab} />
+      <BottomNav activeScreen={mainScreen} pendingCount={pendingSyncCount} onChange={setMainScreen} />
     </View>
   );
 }
 
-function emptyTitle(tab: HomeTab) {
-  if (tab === 'pendingTasks') return 'No pending readings';
-  if (tab === 'submittedTasks') return 'No submitted readings';
+function emptyTitle(tab: ReadingTab) {
+  if (tab === 'pending') return 'No pending readings';
+  if (tab === 'submitted') return 'No submitted readings';
+  if (tab === 'all') return 'No matching readings';
   return 'No approved readings';
 }
 
-function emptyMessage(tab: HomeTab) {
-  if (tab === 'pendingTasks') return 'All assigned meters have been read, or no meters are assigned for today.';
-  if (tab === 'submittedTasks') return 'Readings you submit today will appear here until they are validated.';
+function emptyMessage(tab: ReadingTab) {
+  if (tab === 'pending') return 'All assigned meters have been read, or no meters are assigned for this date.';
+  if (tab === 'submitted') return 'Readings you submit will appear here until supervisor approval.';
+  if (tab === 'all') return 'Adjust search, date, meter type, or scope filters.';
   return 'Validated readings will appear here after supervisor approval.';
 }
 
-function SummaryPill({ label, value }: { label: string; value: number }) {
+function SummaryPill({ label, value, tone = colors.primary }: { label: string; value: number; tone?: string }) {
   return (
     <View style={styles.pill}>
-      <Text style={styles.pillValue}>{value}</Text>
+      <Text style={[styles.pillValue, { color: tone }]}>{value}</Text>
       <Text style={styles.pillLabel}>{label}</Text>
     </View>
   );
 }
 
-function HomeTabs({
+function MeterReadingModule({
   activeTab,
-  onChange,
-  counts,
+  approvedCount,
+  filteredTasks,
+  isLoading,
+  meterTypeFilter,
+  onBack,
+  onDateChange,
+  onFilterChange,
+  onRefresh,
+  onScopeFilterChange,
+  onSearchChange,
+  onSelectTask,
+  onTabChange,
+  onToggleRouteView,
+  pendingCount,
+  readingDate,
+  routeView,
+  scopeFilter,
+  searchTerm,
+  submittedCount,
+  totalCount,
 }: {
-  activeTab: HomeTab;
-  onChange: (tab: HomeTab) => void;
-  counts: Record<HomeTab, number>;
+  activeTab: ReadingTab;
+  approvedCount: number;
+  filteredTasks: ReadingTask[];
+  isLoading: boolean;
+  meterTypeFilter: MeterTypeFilter;
+  onBack: () => void;
+  onDateChange: (value: string) => void;
+  onFilterChange: (value: MeterTypeFilter) => void;
+  onRefresh: () => Promise<void>;
+  onScopeFilterChange: (value: ScopeFilter) => void;
+  onSearchChange: (value: string) => void;
+  onSelectTask: (task: ReadingTask) => void;
+  onTabChange: (tab: ReadingTab) => void;
+  onToggleRouteView: () => void;
+  pendingCount: number;
+  readingDate: string;
+  routeView: boolean;
+  scopeFilter: ScopeFilter;
+  searchTerm: string;
+  submittedCount: number;
+  totalCount: number;
 }) {
-  const tabs: Array<{ key: HomeTab; label: string }> = [
-    { key: 'pendingTasks', label: 'Pending' },
-    { key: 'submittedTasks', label: 'Submitted' },
-    { key: 'approvedReadings', label: 'Approved' },
-    { key: 'incidents', label: 'Incidents' },
+  return (
+    <Screen scroll={false}>
+      <ModuleHeader title="Meter Reading" subtitle={formatFriendlyDate(readingDate)} onBack={onBack} />
+
+      <View style={styles.summaryRow}>
+        <SummaryPill label="Pending" value={pendingCount} tone={colors.warning} />
+        <SummaryPill label="Submitted" value={submittedCount} tone={colors.info} />
+        <SummaryPill label="Approved" value={approvedCount} tone={colors.success} />
+      </View>
+
+      <View style={styles.controls}>
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Reading date</Text>
+          <TextInputBox value={readingDate} onChangeText={onDateChange} placeholder="YYYY-MM-DD" />
+        </View>
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Search</Text>
+          <TextInputBox value={searchTerm} onChangeText={onSearchChange} placeholder="Meter, site, or zone" />
+        </View>
+      </View>
+
+      <SegmentedTabs
+        activeTab={activeTab}
+        counts={{
+          pending: pendingCount,
+          submitted: submittedCount,
+          approved: approvedCount,
+          all: totalCount,
+        }}
+        onChange={onTabChange}
+      />
+
+      <View style={styles.filterRow}>
+        <FilterChip label="All meters" active={meterTypeFilter === 'ALL'} onPress={() => onFilterChange('ALL')} />
+        <FilterChip label="Water" active={meterTypeFilter === 'WATER'} onPress={() => onFilterChange('WATER')} />
+        <FilterChip label="Energy" active={meterTypeFilter === 'ENERGY'} onPress={() => onFilterChange('ENERGY')} />
+      </View>
+
+      <View style={styles.filterRow}>
+        <FilterChip label="All scopes" active={scopeFilter === 'ALL'} onPress={() => onScopeFilterChange('ALL')} />
+        <FilterChip label="Sites" active={scopeFilter === 'PRODUCTION_SITE'} onPress={() => onScopeFilterChange('PRODUCTION_SITE')} />
+        <FilterChip label="Zones" active={scopeFilter === 'ZONE'} onPress={() => onScopeFilterChange('ZONE')} />
+      </View>
+
+      <View style={styles.moduleActions}>
+        <AppButton label={routeView ? 'List View' : 'Route View'} onPress={onToggleRouteView} variant="secondary" style={styles.actionButton} />
+        <PendingFeature label="QR Scan" />
+        <PendingFeature label="Unable To Read" />
+        <PendingFeature label="Photo/GPS" />
+        <PendingFeature label="Offline Tasks" />
+      </View>
+
+      {isLoading ? (
+        <View style={styles.loading}>
+          <ActivityIndicator color={colors.primary} size="large" />
+        </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.list}
+          refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
+        >
+          {filteredTasks.length === 0 ? (
+            <View style={styles.empty}>
+              <Text style={styles.emptyTitle}>{emptyTitle(activeTab)}</Text>
+              <Text style={styles.emptyText}>{emptyMessage(activeTab)}</Text>
+              <AppButton label="Refresh" onPress={onRefresh} variant="secondary" style={styles.refreshButton} />
+            </View>
+          ) : filteredTasks.map((task, index) => (
+            <View key={`${task.meter_type}-${task.meter_id}`} style={styles.taskRow}>
+              {routeView ? (
+                <View style={styles.routeMarker}>
+                  <Text style={styles.routeMarkerText}>{index + 1}</Text>
+                </View>
+              ) : null}
+              <View style={styles.taskCardWrap}>
+                <TaskCard task={task} onPress={() => onSelectTask(task)} />
+              </View>
+            </View>
+          ))}
+        </ScrollView>
+      )}
+    </Screen>
+  );
+}
+
+function ModuleHeader({ title, subtitle, onBack }: { title: string; subtitle: string; onBack: () => void }) {
+  return (
+    <View style={styles.moduleHeader}>
+      <Pressable onPress={onBack} style={styles.backButton}>
+        <Text style={styles.backButtonText}>Back</Text>
+      </Pressable>
+      <View style={styles.moduleTitleBlock}>
+        <Text style={styles.moduleTitle}>{title}</Text>
+        <Text style={styles.moduleSubtitle}>{subtitle}</Text>
+      </View>
+    </View>
+  );
+}
+
+function MenuTile({
+  title,
+  detail,
+  count,
+  tone,
+  onPress,
+}: {
+  title: string;
+  detail: string;
+  count?: number;
+  tone: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.menuTile, pressed && styles.pressed]}>
+      <View style={styles.menuTileTop}>
+        <Text style={styles.menuTitle}>{title}</Text>
+        {typeof count === 'number' ? (
+          <View style={[styles.menuCount, { backgroundColor: `${tone}18` }]}>
+            <Text style={[styles.menuCountText, { color: tone }]}>{count}</Text>
+          </View>
+        ) : null}
+      </View>
+      <Text style={styles.menuDetail}>{detail}</Text>
+      <Text style={[styles.menuAction, { color: tone }]}>Open</Text>
+    </Pressable>
+  );
+}
+
+function SegmentedTabs({
+  activeTab,
+  counts,
+  onChange,
+}: {
+  activeTab: ReadingTab;
+  counts: Record<ReadingTab, number>;
+  onChange: (tab: ReadingTab) => void;
+}) {
+  const tabs: Array<{ key: ReadingTab; label: string }> = [
+    { key: 'pending', label: 'Pending' },
+    { key: 'submitted', label: 'Submitted' },
+    { key: 'approved', label: 'Approved' },
+    { key: 'all', label: 'All/Search' },
   ];
 
   return (
@@ -389,9 +662,53 @@ function HomeTabs({
   );
 }
 
-function BottomNav({ activeTab, pendingCount, onChange }: { activeTab: MainTab; pendingCount: number; onChange: (tab: MainTab) => void }) {
-  const tabs: Array<{ key: MainTab; label: string }> = [
+function FilterChip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} style={[styles.filterChip, active && styles.activeFilterChip]}>
+      <Text style={[styles.filterChipText, active && styles.activeFilterChipText]}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function PendingFeature({ label }: { label: string }) {
+  const handlePress = () => {
+    Alert.alert('Pending setup', `${label} needs backend or native support before field use.`);
+  };
+  return (
+    <Pressable onPress={handlePress} style={styles.pendingFeature}>
+      <Text style={styles.pendingFeatureLabel}>{label}</Text>
+      <Text style={styles.pendingFeatureBadge}>Pending</Text>
+    </Pressable>
+  );
+}
+
+function TextInputBox({
+  value,
+  onChangeText,
+  placeholder,
+}: {
+  value: string;
+  onChangeText: (value: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <TextInput
+      value={value}
+      onChangeText={onChangeText}
+      placeholder={placeholder}
+      placeholderTextColor={colors.muted}
+      autoCapitalize="none"
+      autoCorrect={false}
+      style={styles.textInput}
+    />
+  );
+}
+
+function BottomNav({ activeScreen, pendingCount, onChange }: { activeScreen: MainScreen; pendingCount: number; onChange: (tab: MainScreen) => void }) {
+  const tabs: Array<{ key: MainScreen; label: string }> = [
     { key: 'home', label: 'Home' },
+    { key: 'meterReading', label: 'Readings' },
+    { key: 'incidents', label: 'Incidents' },
     { key: 'sync', label: pendingCount ? `Sync (${pendingCount})` : 'Sync' },
     { key: 'settings', label: 'Settings' },
   ];
@@ -399,8 +716,8 @@ function BottomNav({ activeTab, pendingCount, onChange }: { activeTab: MainTab; 
   return (
     <View style={styles.tabBar}>
       {tabs.map(tab => (
-        <Pressable key={tab.key} onPress={() => onChange(tab.key)} style={[styles.tab, activeTab === tab.key && styles.activeTab]}>
-          <Text style={[styles.tabText, activeTab === tab.key && styles.activeTabText]}>{tab.label}</Text>
+        <Pressable key={tab.key} onPress={() => onChange(tab.key)} style={[styles.tab, activeScreen === tab.key && styles.activeTab]}>
+          <Text style={[styles.tabText, activeScreen === tab.key && styles.activeTabText]}>{tab.label}</Text>
         </Pressable>
       ))}
     </View>
@@ -414,6 +731,9 @@ const styles = StyleSheet.create({
   },
   mainPane: {
     flex: 1,
+  },
+  pressed: {
+    opacity: 0.75,
   },
   header: {
     alignItems: 'flex-start',
@@ -462,6 +782,67 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 12,
   },
+  summaryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 18,
+  },
+  sectionHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  sectionTitle: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  menuGrid: {
+    gap: 10,
+  },
+  menuTile: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: 10,
+    borderWidth: 1,
+    gap: 8,
+    minHeight: 98,
+    padding: 14,
+  },
+  menuTileTop: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 10,
+    justifyContent: 'space-between',
+  },
+  menuTitle: {
+    color: colors.text,
+    flex: 1,
+    fontSize: 17,
+    fontWeight: '900',
+  },
+  menuCount: {
+    alignItems: 'center',
+    borderRadius: 999,
+    minWidth: 34,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+  },
+  menuCountText: {
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  menuDetail: {
+    color: colors.muted,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  menuAction: {
+    fontSize: 13,
+    fontWeight: '900',
+  },
   homeTabs: {
     backgroundColor: colors.surface,
     borderColor: colors.border,
@@ -501,7 +882,8 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 10,
     borderWidth: 1,
-    flex: 1,
+    flexBasis: '48%',
+    flexGrow: 1,
     padding: 10,
   },
   pillValue: {
@@ -519,9 +901,151 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  moduleHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 14,
+  },
+  backButton: {
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: 8,
+    borderWidth: 1,
+    minHeight: 40,
+    minWidth: 64,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+  },
+  backButtonText: {
+    color: colors.primary,
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  moduleTitleBlock: {
+    flex: 1,
+  },
+  moduleTitle: {
+    color: colors.text,
+    fontSize: 23,
+    fontWeight: '900',
+  },
+  moduleSubtitle: {
+    color: colors.muted,
+    fontSize: 13,
+    marginTop: 2,
+  },
+  controls: {
+    gap: 10,
+    marginBottom: 12,
+  },
+  inputGroup: {
+    gap: 6,
+  },
+  inputLabel: {
+    color: colors.text,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  textInput: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: 8,
+    borderWidth: 1,
+    color: colors.text,
+    fontSize: 15,
+    minHeight: 44,
+    paddingHorizontal: 12,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+  },
+  filterChip: {
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: 8,
+    borderWidth: 1,
+    flex: 1,
+    minHeight: 38,
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  activeFilterChip: {
+    backgroundColor: colors.surfaceAlt,
+    borderColor: colors.primary,
+  },
+  filterChipText: {
+    color: colors.muted,
+    fontSize: 12,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  activeFilterChipText: {
+    color: colors.primary,
+  },
+  moduleActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  actionButton: {
+    minHeight: 42,
+    width: '48%',
+  },
+  pendingFeature: {
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: 3,
+    minHeight: 42,
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+    width: '48%',
+  },
+  pendingFeatureLabel: {
+    color: colors.text,
+    fontSize: 12,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
+  pendingFeatureBadge: {
+    color: colors.warning,
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
   list: {
     gap: 10,
     paddingBottom: 20,
+  },
+  taskRow: {
+    alignItems: 'stretch',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  taskCardWrap: {
+    flex: 1,
+  },
+  routeMarker: {
+    alignItems: 'center',
+    backgroundColor: colors.surfaceAlt,
+    borderColor: colors.border,
+    borderRadius: 8,
+    borderWidth: 1,
+    minWidth: 34,
+    justifyContent: 'center',
+  },
+  routeMarkerText: {
+    color: colors.primary,
+    fontSize: 13,
+    fontWeight: '900',
   },
   empty: {
     alignItems: 'center',

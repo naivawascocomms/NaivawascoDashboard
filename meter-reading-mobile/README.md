@@ -52,4 +52,4 @@ npm run android
 - Reading submissions are idempotent by meter/date and cannot update validated readings.
 - Pending readings and incident actions are stored locally with AsyncStorage and can be retried automatically or manually from the Sync tab.
 - Auto-sync keeps retrying network/server failures. Validation failures stay in the Sync tab for correction.
-- The app no longer uses Supabase Auth or direct Supabase table access.
+- The app uses Django JWT and backend API endpoints directly.

@@ -1,13 +1,11 @@
 import { useMemo, useState } from 'react';
-import { Header } from '@/components/dashboard/Header';
-import { DistributionKPICard } from '@/components/distribution/DistributionKPICard';
+import { KpiCard } from '@/components/kpi/KpiCard';
+import { PageToolbar } from '@/components/layout/PageToolbar';
 import { NRWTrendChart } from '@/components/distribution/NRWTrendChart';
 import { RegionalPerformanceCard } from '@/components/distribution/RegionalPerformanceCard';
-import { SalesCustomerCareSection } from '@/components/distribution/SalesCustomerCareSection';
 import { ZonalTable } from '@/components/distribution/ZonalTable';
 import { PeriodFilter } from '@/components/filters/PeriodFilter';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useCustomerBillingData,
   useDistributionFyTrend,
@@ -15,36 +13,14 @@ import {
   useMonthlyDistribution,
   useZones,
 } from '@/hooks/useDistribution';
-import { Coins, Droplets, Loader2, ReceiptText } from 'lucide-react';
+import { Droplets } from 'lucide-react';
+import { LoadingState } from '@/components/layout/QueryState';
+import { toNumber as n } from '@/lib/format';
+import { MONTH_SHORT_LABELS, calYearForFyMonth, fyYearForDate } from '@/lib/fiscalYear';
 import type { MonthlyDistributionTrend, RegionalMetrics, ZonalMetrics } from '@/types/distribution';
 
-const NOW = new Date();
-const DEFAULT_FY_YEAR = NOW.getMonth() >= 6 ? NOW.getFullYear() : NOW.getFullYear() - 1;
-const DEFAULT_MONTH = NOW.getMonth() + 1;
-const FY_MONTH_LABELS: Record<number, string> = {
-  7: 'Jul',
-  8: 'Aug',
-  9: 'Sep',
-  10: 'Oct',
-  11: 'Nov',
-  12: 'Dec',
-  1: 'Jan',
-  2: 'Feb',
-  3: 'Mar',
-  4: 'Apr',
-  5: 'May',
-  6: 'Jun',
-};
-
-function n(val: string | number | null | undefined): number {
-  if (val == null || val === '') return 0;
-  const parsed = typeof val === 'number' ? val : parseFloat(val);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function calYearForFyMonth(fyYear: number, month: number): number {
-  return month >= 7 ? fyYear : fyYear + 1;
-}
+const DEFAULT_FY_YEAR = fyYearForDate();
+const DEFAULT_MONTH = new Date().getMonth() + 1;
 
 function getKpiStatus(nrwPercent: number): 'good' | 'warning' | 'critical' {
   if (nrwPercent <= 20) return 'good';
@@ -60,12 +36,6 @@ function titleCaseRegion(region: string | null | undefined): string {
     .split(/[\s_]+/)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
-}
-
-function formatCompactNumber(value: number) {
-  if (value >= 1000000) return `${(value / 1000000).toFixed(2)}M`;
-  if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
-  return value.toLocaleString();
 }
 
 function formatTrendMonthLabel(month: string, period?: string) {
@@ -99,14 +69,10 @@ function filterByZone<T extends { zone?: number; zones?: string[]; region?: stri
 export default function DistributionDashboard() {
   const [selectedMonth, setSelectedMonth] = useState(DEFAULT_MONTH);
   const [selectedFyYear, setSelectedFyYear] = useState(DEFAULT_FY_YEAR);
-  const [activeSection, setActiveSection] = useState<'commercial' | 'sales_cc'>('commercial');
   const [selectedZone, setSelectedZone] = useState<string>('all');
-  const [salesCcRefreshNonce, setSalesCcRefreshNonce] = useState(0);
-  const [salesCcPeriodLabel, setSalesCcPeriodLabel] = useState('Distribution / Sales & CC');
 
   const calendarYear = calYearForFyMonth(selectedFyYear, selectedMonth);
   const selectedZoneId = selectedZone === 'all' ? undefined : parseInt(selectedZone, 10);
-  const commercialEnabled = activeSection === 'commercial';
 
   const { data: zonesData } = useZones({ is_active: true });
   const zoneMetaMap = useMemo(
@@ -118,48 +84,23 @@ export default function DistributionDashboard() {
     data: commercialMonthlyData,
     isLoading: commercialMonthlyLoading,
     refetch: refetchCommercialMonthly,
-  } =
-    useMonthlyDistribution(
-      { year: calendarYear, month: selectedMonth, zone: selectedZoneId },
-      { enabled: commercialEnabled }
-    );
+  } = useMonthlyDistribution({ year: calendarYear, month: selectedMonth, zone: selectedZoneId });
   const {
     data: globalNRWData,
     isLoading: globalNRWLoading,
     refetch: refetchGlobal,
-  } =
-    useGlobalNRW(
-      { year: calendarYear, month: selectedMonth },
-      { enabled: commercialEnabled }
-    );
+  } = useGlobalNRW({ year: calendarYear, month: selectedMonth });
   const {
     data: customerBillingCurrentMonthData,
-    isLoading: customerBillingLoading,
     refetch: refetchBilling,
-  } =
-    useCustomerBillingData(
-      { year: calendarYear, month: selectedMonth, zone: selectedZoneId },
-      { enabled: commercialEnabled }
-    );
-  const {
-    data: distributionTrendData,
-    isLoading: commercialTrendLoading,
-  } =
-    useDistributionFyTrend(
-      {
-        mode: 'rolling_12',
-        anchor_year: calendarYear,
-        anchor_month: selectedMonth,
-      },
-      { enabled: commercialEnabled }
-    );
+  } = useCustomerBillingData({ year: calendarYear, month: selectedMonth, zone: selectedZoneId });
+  const { data: distributionTrendData } = useDistributionFyTrend({
+    mode: 'rolling_12',
+    anchor_year: calendarYear,
+    anchor_month: selectedMonth,
+  });
 
   const handleRefresh = async () => {
-    if (activeSection === 'sales_cc') {
-      setSalesCcRefreshNonce((value) => value + 1);
-      return;
-    }
-
     await Promise.all([
       refetchCommercialMonthly(),
       refetchBilling(),
@@ -304,155 +245,119 @@ export default function DistributionDashboard() {
     return filterByZone(cards, selectedZoneId, selectedZoneNames);
   }, [commercialZonalData, selectedZoneId, selectedZoneNames]);
 
-  const isLoading = activeSection === 'commercial' && (commercialMonthlyLoading || globalNRWLoading);
-  if (isLoading) {
+  if (commercialMonthlyLoading || globalNRWLoading) {
     return (
-      <div className="min-h-screen bg-gradient-surface flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="container py-6 md:py-8">
+        <LoadingState label="Loading distribution dashboard…" />
       </div>
     );
   }
 
   const globalSummary = globalNRWData?.results?.[0];
-  const currentPeriodLabel = activeSection === 'sales_cc'
-    ? salesCcPeriodLabel
-    : `${FY_MONTH_LABELS[selectedMonth] || 'Unknown'} ${calendarYear}`;
+  const currentPeriodLabel = `${MONTH_SHORT_LABELS[selectedMonth] || 'Unknown'} ${calendarYear}`;
 
   return (
     <div className="min-h-screen bg-gradient-surface">
-      <div className="container py-6 md:py-8">
-        <Header currentPeriod={currentPeriodLabel} onRefresh={handleRefresh} />
+      <div className="container space-y-6 py-6 md:py-8">
+        <PageToolbar periodLabel={currentPeriodLabel} onRefresh={handleRefresh}>
+          <PeriodFilter
+            selectedMonth={selectedMonth.toString()}
+            selectedYear={selectedFyYear.toString()}
+            onMonthChange={(month) => setSelectedMonth(parseInt(month))}
+            onYearChange={(year) => setSelectedFyYear(parseInt(year))}
+            allowAllMonths={false}
+          />
+          <ZoneFilter
+            selectedZone={selectedZone}
+            onZoneChange={setSelectedZone}
+            zones={zonesData?.results ?? []}
+          />
+        </PageToolbar>
 
-        <Tabs
-          value={activeSection}
-          onValueChange={(value) => setActiveSection(value as 'commercial' | 'sales_cc')}
-          className="space-y-6"
-        >
-          <div className="rounded-2xl border border-border/50 bg-card/70 p-4 shadow-soft">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="text-xl font-semibold text-foreground">Distribution</h2>
-              <TabsList className="h-auto flex-wrap gap-1 p-1">
-                <TabsTrigger value="commercial" className="flex items-center gap-1.5">
-                  <Coins className="h-3.5 w-3.5" />
-                  Commercial
-                </TabsTrigger>
-                <TabsTrigger value="sales_cc" className="flex items-center gap-1.5">
-                  <ReceiptText className="h-3.5 w-3.5" />
-                  Sales & CC
-                </TabsTrigger>
-              </TabsList>
+        {globalSummary && (
+          <div className="rounded-xl border border-accent/20 bg-accent/5 p-4 animate-fade-in">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Droplets className="h-6 w-6 text-accent" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Global Commercial NRW</p>
+                  <p className="text-2xl font-bold mono-value">
+                    {n(globalSummary.global_nrw_percentage).toFixed(1)}%
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Target {(n(globalSummary.global_nrw_target_percentage) || 22).toFixed(1)}%
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-6 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Available:</span>{' '}
+                  <span className="font-semibold mono-value">
+                    {(n(globalSummary.water_available_for_sale_m3) / 1000000).toFixed(2)} M m3
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Billed:</span>{' '}
+                  <span className="font-semibold mono-value">
+                    {(n(globalSummary.volume_billed_to_customers_m3) / 1000000).toFixed(2)} M m3
+                  </span>
+                </div>
+                {n(globalSummary.transmission_loss_percentage) > 0 && (
+                  <div>
+                    <span className="text-muted-foreground">Transmission Loss:</span>{' '}
+                    <span className="font-semibold text-warning mono-value">
+                      {n(globalSummary.transmission_loss_percentage).toFixed(1)}%
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+        )}
 
-          <TabsContent value="commercial" className="space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/50 bg-card p-4">
-              <PeriodFilter
-                selectedMonth={selectedMonth.toString()}
-                selectedYear={selectedFyYear.toString()}
-                onMonthChange={(month) => setSelectedMonth(parseInt(month))}
-                onYearChange={(year) => setSelectedFyYear(parseInt(year))}
-                allowAllMonths={false}
-              />
-              <ZoneFilter
-                selectedZone={selectedZone}
-                onZoneChange={setSelectedZone}
-                zones={zonesData?.results ?? []}
-              />
+        <section>
+          <h2 className="section-title mb-4">Commercial Distribution Performance</h2>
+          <div className="data-grid">
+            {commercialKPIs.map((kpi, idx) => (
+              <KpiCard key={kpi.label} {...kpi} delay={idx * 100} />
+            ))}
+          </div>
+        </section>
+
+        {trendData.length > 1 && (
+          <section>
+            <h2 className="section-title mb-4">Commercial NRW Trend</h2>
+            <NRWTrendChart data={trendData} />
+          </section>
+        )}
+
+        {commercialRegionalCards.length > 0 && (
+          <section>
+            <h2 className="section-title mb-4">Regional Commercial Snapshot</h2>
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+              {commercialRegionalCards.map((region, idx) => (
+                <RegionalPerformanceCard
+                  key={region.region}
+                  region={region}
+                  variant="commercial"
+                  delay={idx * 100}
+                />
+              ))}
             </div>
+          </section>
+        )}
 
-            {globalSummary && (
-              <div className="rounded-xl border border-accent/20 bg-accent/5 p-4 animate-fade-in">
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <Droplets className="h-6 w-6 text-accent" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Global Commercial NRW</p>
-                      <p className="text-2xl font-bold mono-value">
-                        {n(globalSummary.global_nrw_percentage).toFixed(1)}%
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Target {(n(globalSummary.global_nrw_target_percentage) || 22).toFixed(1)}%
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-6 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Available:</span>{' '}
-                      <span className="font-semibold mono-value">
-                        {(n(globalSummary.water_available_for_sale_m3) / 1000000).toFixed(2)} M m3
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Billed:</span>{' '}
-                      <span className="font-semibold mono-value">
-                        {(n(globalSummary.volume_billed_to_customers_m3) / 1000000).toFixed(2)} M m3
-                      </span>
-                    </div>
-                    {n(globalSummary.transmission_loss_percentage) > 0 && (
-                      <div>
-                        <span className="text-muted-foreground">Transmission Loss:</span>{' '}
-                        <span className="font-semibold text-warning mono-value">
-                          {n(globalSummary.transmission_loss_percentage).toFixed(1)}%
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <section>
-              <h2 className="section-title mb-4">Commercial Distribution Performance</h2>
-              <div className="data-grid">
-                {commercialKPIs.map((kpi, idx) => (
-                  <DistributionKPICard key={kpi.label} {...kpi} delay={idx * 100} />
-                ))}
-              </div>
-            </section>
-
-            {trendData.length > 1 && (
-              <section>
-                <h2 className="section-title mb-4">Commercial NRW Trend</h2>
-                <NRWTrendChart data={trendData} />
-              </section>
-            )}
-
-            {commercialRegionalCards.length > 0 && (
-              <section>
-                <h2 className="section-title mb-4">Regional Commercial Snapshot</h2>
-                <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-                  {commercialRegionalCards.map((region, idx) => (
-                    <RegionalPerformanceCard
-                      key={region.region}
-                      region={region}
-                      variant="commercial"
-                      delay={idx * 100}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            <section>
-              <h2 className="section-title mb-4">Commercial Zonal Performance</h2>
-              {commercialZonalData.length > 0 ? (
-                <ZonalTable zones={commercialZonalData} selectedRegion="all" variant="commercial" />
-              ) : (
-                <div className="chart-container animate-slide-up p-6 text-sm text-muted-foreground">
-                  No commercial distribution data is available for the selected period.
-                </div>
-              )}
-            </section>
-          </TabsContent>
-
-          <TabsContent value="sales_cc" className="space-y-6">
-            <SalesCustomerCareSection
-              refreshNonce={salesCcRefreshNonce}
-              onPeriodChange={setSalesCcPeriodLabel}
-            />
-          </TabsContent>
-        </Tabs>
+        <section>
+          <h2 className="section-title mb-4">Commercial Zonal Performance</h2>
+          {commercialZonalData.length > 0 ? (
+            <ZonalTable zones={commercialZonalData} selectedRegion="all" variant="commercial" />
+          ) : (
+            <div className="chart-container animate-slide-up p-6 text-sm text-muted-foreground">
+              No commercial distribution data is available for the selected period.
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );
@@ -481,25 +386,5 @@ function ZoneFilter({
         ))}
       </SelectContent>
     </Select>
-  );
-}
-
-function CompactStat({
-  label,
-  value,
-  icon: Icon,
-}: {
-  label: string;
-  value: string;
-  icon: typeof Droplets;
-}) {
-  return (
-    <div className="rounded-xl border border-border/50 bg-card p-4">
-      <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
-        <Icon className="h-3.5 w-3.5" />
-        {label}
-      </div>
-      <div className="mt-2 text-lg font-semibold mono-value text-foreground">{value}</div>
-    </div>
   );
 }

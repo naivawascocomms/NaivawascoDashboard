@@ -128,17 +128,8 @@ Notes:
 
 - The root Docker deployment uses the internal PostgreSQL container at service name `db`.
 - The Compose files already set `DATABASE_URL` correctly for this internal database path.
+- The mobile app uses the same Django API at `/api`.
 - Keep `DJANGO_DEBUG=False` on any shared server.
-
-If mobile sync should run on the server, also set:
-
-```env
-MOBILE_SUPABASE_DATABASE_URL=<mobile-supabase-pooler-url>
-MOBILE_SUPABASE_URL=<mobile-supabase-url>
-MOBILE_SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
-MOBILE_SUPABASE_DEFAULT_PASSWORD=<temporary-password-if-needed>
-MOBILE_SYNC_INTERVAL=10
-```
 
 ## 6. Start The LAN Deployment
 
@@ -172,7 +163,7 @@ Copy that dump into the server repository `backups/` directory, then restore:
 
 ```bash
 docker compose exec db pg_restore -U postgres -d naivawasco_local --clean --if-exists /backups/naivawasco_local.dump
-docker compose restart backend mobile-sync
+docker compose restart backend
 ```
 
 Verify:

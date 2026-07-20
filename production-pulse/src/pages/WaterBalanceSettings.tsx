@@ -40,6 +40,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useZones } from '@/hooks/useDistribution';
 import { useWaterMeters } from '@/hooks/useMetering';
 import { useProductionSites } from '@/hooks/useProduction';
+import { WaterBalanceVisualModel } from '@/components/water-balance/WaterBalanceVisualModel';
 import {
   useConfiguredSourceAttributions,
   useCreateWaterBalanceModel,
@@ -175,13 +176,33 @@ export default function WaterBalanceSettings() {
   const { data: zonesData } = useZones({ is_active: true });
   const { data: sitesData } = useProductionSites({ is_active: true });
   const { data: metersData } = useWaterMeters({ is_active: true, ordering: 'display_name,meter_number' });
-  const { data: nodesData, isLoading: nodesLoading } = useWaterBalanceNodes({ is_active: true, ordering: 'name' });
-  const { data: modelsData, isLoading: modelsLoading } = useWaterBalanceModels({
+  const {
+    data: nodesData,
+    isLoading: nodesLoading,
+    isFetching: nodesFetching,
+    refetch: refetchNodes,
+  } = useWaterBalanceNodes({ is_active: true, ordering: 'name' });
+  const {
+    data: modelsData,
+    isLoading: modelsLoading,
+    isFetching: modelsFetching,
+    refetch: refetchModels,
+  } = useWaterBalanceModels({
     is_active: true,
     ordering: 'zone__region__dashboard_order,zone__dashboard_order,zone__name,-effective_start_date',
   });
-  const { data: rulesData, isLoading: rulesLoading } = useWaterBalanceRules({ is_active: true, ordering: 'priority' });
-  const { data: inputsData, isLoading: inputsLoading } = useWaterBalanceNodeInputs({ is_active: true, ordering: 'priority' });
+  const {
+    data: rulesData,
+    isLoading: rulesLoading,
+    isFetching: rulesFetching,
+    refetch: refetchRules,
+  } = useWaterBalanceRules({ is_active: true, ordering: 'priority' });
+  const {
+    data: inputsData,
+    isLoading: inputsLoading,
+    isFetching: inputsFetching,
+    refetch: refetchInputs,
+  } = useWaterBalanceNodeInputs({ is_active: true, ordering: 'priority' });
   const report = useConfiguredSourceAttributions(attributionParams);
   const cycleReport = useZoneCycleSourceAttributions(cycleParams, { enabled: !!cycleZone });
 
@@ -205,6 +226,17 @@ export default function WaterBalanceSettings() {
     0,
     (allocationData?.total_zone_supply_m3 ?? 0) - (allocationData?.total_allocated_volume_m3 ?? 0),
   );
+  const visualModelLoading = nodesLoading || modelsLoading || rulesLoading || inputsLoading;
+  const visualModelRefreshing = nodesFetching || modelsFetching || rulesFetching || inputsFetching;
+
+  function refreshVisualModel() {
+    void Promise.all([
+      refetchNodes(),
+      refetchModels(),
+      refetchRules(),
+      refetchInputs(),
+    ]);
+  }
 
   async function submitNode(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -341,6 +373,7 @@ export default function WaterBalanceSettings() {
               <TabsTrigger value="rules"><Route className="mr-1.5 h-3.5 w-3.5" />Rules</TabsTrigger>
               <TabsTrigger value="nodes"><Network className="mr-1.5 h-3.5 w-3.5" />Nodes</TabsTrigger>
               <TabsTrigger value="inputs"><GitBranch className="mr-1.5 h-3.5 w-3.5" />Inputs</TabsTrigger>
+              <TabsTrigger value="visual"><GitBranch className="mr-1.5 h-3.5 w-3.5" />Visual Model</TabsTrigger>
             </TabsList>
           </CardContent>
         </Card>
@@ -578,6 +611,21 @@ export default function WaterBalanceSettings() {
             ))}
           </ListCard>
         </TabsContent>
+
+        <TabsContent value="visual" className="space-y-6">
+          <WaterBalanceVisualModel
+            zones={zones}
+            sites={sites}
+            meters={meters}
+            nodes={nodes}
+            models={models}
+            rules={rules}
+            inputs={inputs}
+            loading={visualModelLoading}
+            onRefresh={refreshVisualModel}
+            refreshing={visualModelRefreshing}
+          />
+        </TabsContent>
       </Tabs>
     </div>
   );
@@ -681,48 +729,62 @@ function SummaryTile({ label, value, icon: Icon }: { label: string; value: strin
   );
 }
 
-function SiteSelect({ value, sites, onChange, includeNone = false }: any) {
+interface OptionSelectProps {
+  value: string;
+  onChange: (value: string) => void;
+  includeNone?: boolean;
+}
+
+function SiteSelect({ value, sites, onChange, includeNone = false }: OptionSelectProps & {
+  sites: Array<{ id: number; name: string }>;
+}) {
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger><SelectValue placeholder="Select production site" /></SelectTrigger>
       <SelectContent>
         {includeNone ? <SelectItem value={NONE_VALUE}>None</SelectItem> : null}
-        {sites.map((site: any) => <SelectItem key={site.id} value={String(site.id)}>{site.name}</SelectItem>)}
+        {sites.map((site) => <SelectItem key={site.id} value={String(site.id)}>{site.name}</SelectItem>)}
       </SelectContent>
     </Select>
   );
 }
 
-function NodeSelect({ value, nodes, onChange, includeNone = false }: any) {
+function NodeSelect({ value, nodes, onChange, includeNone = false }: OptionSelectProps & {
+  nodes: Array<{ id: number; name: string }>;
+}) {
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger><SelectValue placeholder="Select node" /></SelectTrigger>
       <SelectContent>
         {includeNone ? <SelectItem value={NONE_VALUE}>None</SelectItem> : null}
-        {nodes.map((node: any) => <SelectItem key={node.id} value={String(node.id)}>{node.name}</SelectItem>)}
+        {nodes.map((node) => <SelectItem key={node.id} value={String(node.id)}>{node.name}</SelectItem>)}
       </SelectContent>
     </Select>
   );
 }
 
-function ModelSelect({ value, models, onChange }: any) {
+function ModelSelect({ value, models, onChange }: Omit<OptionSelectProps, 'includeNone'> & {
+  models: Array<{ id: number; name: string; zone_name: string }>;
+}) {
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger><SelectValue placeholder="Select model" /></SelectTrigger>
       <SelectContent>
-        {models.map((model: any) => <SelectItem key={model.id} value={String(model.id)}>{model.zone_name} - {model.name}</SelectItem>)}
+        {models.map((model) => <SelectItem key={model.id} value={String(model.id)}>{model.zone_name} - {model.name}</SelectItem>)}
       </SelectContent>
     </Select>
   );
 }
 
-function MeterSelect({ value, meters, onChange, includeNone = false }: any) {
+function MeterSelect({ value, meters, onChange, includeNone = false }: OptionSelectProps & {
+  meters: Array<{ id: number; meter_number: string; display_label?: string | null }>;
+}) {
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger><SelectValue placeholder="Select meter" /></SelectTrigger>
       <SelectContent>
         {includeNone ? <SelectItem value={NONE_VALUE}>None</SelectItem> : null}
-        {meters.map((meter: any) => <SelectItem key={meter.id} value={String(meter.id)}>{meter.display_label || meter.meter_number}</SelectItem>)}
+        {meters.map((meter) => <SelectItem key={meter.id} value={String(meter.id)}>{meter.display_label || meter.meter_number}</SelectItem>)}
       </SelectContent>
     </Select>
   );
